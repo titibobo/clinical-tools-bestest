@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BESTest · Mini-BESTest — passation clinique</title>
+<style>
+:root{
+  --bg:#f6f5f2; --panel:#ffffff; --ink:#1d2327; --muted:#5f6b72; --line:#dfe2e0; --soft:#eef0ee;
+  --acc:#1f6f78; --acc-soft:#e3f0f1; --warn:#a15c0e; --warn-soft:#fbf0e1; --bad:#a3312b; --ok:#2f7d4f;
+  --s0:#c9584f; --s1:#d8933a; --s2:#7fae5a; --s3:#2f7d4f;
+  --r:8px; --gap:16px; --nav:300px;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  font-family:var(--sans); color:var(--ink); background:var(--bg);
+}
+*{box-sizing:border-box}
+body{margin:0;font-size:15px;line-height:1.45}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit;cursor:pointer}
+input{font:inherit}
+/* ---- barre haute ---- */
+header{position:sticky;top:0;z-index:20;background:var(--panel);border-bottom:1px solid var(--line);
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:var(--gap);padding:10px 16px}
+.brand{font-weight:600;letter-spacing:.01em;white-space:nowrap}
+.brand small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.meta{display:grid;grid-template-columns:repeat(3,minmax(120px,190px));gap:8px;justify-content:center}
+.meta label{display:grid;grid-template-rows:auto auto;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.meta label{min-width:0}
+.meta input{width:100%;min-width:0;height:34px;border:1px solid var(--line);border-radius:6px;padding:0 10px;background:var(--bg);font-size:14px;text-transform:none;letter-spacing:0;color:var(--ink)}
+.seg{display:inline-grid;grid-auto-flow:column;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--bg)}
+.seg button{border:0;background:transparent;padding:7px 12px;font-size:13px;min-width:64px}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--acc);color:#fff}
+.hdr-right{display:grid;grid-auto-flow:column;gap:8px;align-items:center}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:var(--nav) 1fr;min-height:calc(100vh - 58px)}
+nav{border-right:1px solid var(--line);background:var(--panel);overflow:auto;position:sticky;top:58px;height:calc(100vh - 58px);padding:8px 0 90px}
+.navtabs{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px 10px 10px;border-bottom:1px solid var(--line)}
+.navtabs button{border:1px solid var(--line);background:var(--bg);border-radius:6px;padding:6px 0;font-size:12.5px}
+.navtabs button.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc);font-weight:500}
+.order{display:grid;grid-template-columns:1fr auto;align-items:center;padding:10px 12px 4px;font-size:12px;color:var(--muted)}
+.grp{padding:12px 12px 4px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:grid;grid-template-columns:1fr auto}
+.row{display:grid;grid-template-columns:28px 1fr 52px;align-items:center;gap:6px;padding:7px 12px;border:0;background:transparent;width:100%;text-align:left;font-size:13.5px;border-left:3px solid transparent}
+.row:hover{background:var(--soft)}
+.row.cur{background:var(--acc-soft);border-left-color:var(--acc)}
+.row .n{color:var(--muted);text-align:right}
+.row .sc{text-align:right}
+.badge{display:inline-block;min-width:44px;text-align:center;border-radius:5px;padding:1px 0;font-size:12px;background:var(--soft);color:var(--muted)}
+.badge.done{background:var(--acc);color:#fff}
+.badge.part{background:var(--warn-soft);color:var(--warn)}
+main{padding:20px 24px 110px;max-width:1020px;width:100%}
+/* ---- carte item ---- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px}
+.ihead{display:grid;grid-template-columns:auto 1fr auto;gap:14px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px}
+.ihead .no{font-size:28px;font-weight:600;color:var(--acc);line-height:1}
+.ihead h2{margin:0;font-size:20px;font-weight:600}
+.ihead .crumb{font-size:12px;color:var(--muted);display:block;margin-top:2px;font-weight:400}
+.ihead .tot{font-size:22px;text-align:right}
+.ihead .tot small{display:block;font-size:11px;color:var(--muted);font-family:var(--sans)}
+.say{background:var(--acc-soft);border-left:3px solid var(--acc);padding:10px 14px;border-radius:0 6px 6px 0;margin:0 0 10px;font-size:15.5px}
+.say b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--acc);margin-bottom:2px}
+details.exam{margin:0 0 14px;font-size:14px;color:var(--muted)}
+details.exam summary{cursor:pointer;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+details.exam p{margin:6px 0 0;color:var(--ink)}
+.dtnum{display:grid;grid-template-columns:auto auto auto;gap:10px;align-items:center;justify-content:start;margin:0 0 14px;font-size:13.5px}
+.dtnum .big{font-size:20px;font-weight:500;background:var(--soft);padding:2px 10px;border-radius:5px}
+.unit{border:1px solid var(--line);border-radius:7px;padding:12px 14px;margin-top:12px}
+.unit h3{margin:0 0 10px;font-size:13px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600;display:grid;grid-template-columns:1fr auto}
+.inputs{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-bottom:12px}
+.fld{display:grid;grid-template-columns:1fr;gap:3px;font-size:12px;color:var(--muted)}
+.fld .ctl{display:grid;grid-template-columns:1fr 92px;gap:6px}
+.fld .ctl.nochrono{grid-template-columns:1fr}
+.fld input[type=number]{height:40px;border:1px solid var(--line);border-radius:6px;padding:0 10px;font-family:var(--mono);font-size:16px;text-align:right;background:var(--bg);width:100%}
+.chrono{height:40px;border:1px solid var(--acc);background:#fff;color:var(--acc);border-radius:6px;font-family:var(--mono);font-size:14px}
+.chrono.run{background:var(--acc);color:#fff}
+.flag{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:center;font-size:13.5px;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:9px 10px;cursor:pointer;min-height:40px}
+.flag input{width:18px;height:18px;margin:0;accent-color:var(--acc)}
+.flags{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-bottom:12px}
+.levels{display:grid;gap:6px}
+.lvl{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:center;text-align:left;border:1px solid var(--line);background:#fff;border-radius:6px;padding:8px 10px;min-height:44px;font-size:14px}
+.lvl .s{font-family:var(--mono);font-size:18px;font-weight:500;text-align:center;border-radius:5px;height:30px;line-height:30px;background:var(--soft)}
+.lvl.sug{border-style:dashed;border-color:var(--acc)}
+.lvl.sel{border-color:var(--acc);background:var(--acc-soft);box-shadow:inset 0 0 0 1px var(--acc)}
+.lvl.sel .s{background:var(--acc);color:#fff}
+.note{font-size:12.5px;color:var(--warn);background:var(--warn-soft);border-radius:5px;padding:5px 9px;margin-top:8px}
+.note.info{color:var(--muted);background:var(--soft)}
+.mods{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.free{width:100%;margin-top:12px;border:1px solid var(--line);border-radius:6px;padding:8px 10px;min-height:56px;font:inherit;font-size:14px;background:var(--bg);resize:vertical}
+.pager{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;margin-top:16px;align-items:center}
+.pager .kb{font-size:12px;color:var(--muted);text-align:center}
+.btn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:10px 16px;font-size:14px}
+.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.sm{padding:6px 10px;font-size:13px}
+.btn:disabled{opacity:.4;cursor:default}
+.pager .btn:first-child{justify-self:start}
+.pager .btn:last-child{justify-self:end}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+input[type=number]{-moz-appearance:textfield;appearance:textfield}
+/* ---- barre basse ---- */
+.dock{position:fixed;bottom:0;left:0;right:0;z-index:15;background:var(--panel);border-top:1px solid var(--line);
+  display:grid;grid-template-columns:var(--nav) 1fr auto;align-items:center}
+.dock .totbox{padding:10px 16px;border-right:1px solid var(--line);display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:baseline}
+.dock .totbox .big{font-size:26px;font-weight:500}
+.dock .totbox small{color:var(--muted);font-size:12px}
+.secbars{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:14px;padding:8px 18px}
+.sb{display:grid;grid-template-rows:auto 6px;gap:4px;font-size:11.5px;color:var(--muted)}
+.sb .lab{display:grid;grid-template-columns:1fr auto}
+.sb .bar{background:var(--soft);border-radius:3px;overflow:hidden}
+.sb .bar i{display:block;height:100%;background:var(--acc)}
+.dock .act{padding:0 16px;display:grid;grid-auto-flow:column;gap:8px}
+/* ---- vues ---- */
+h1.v{font-size:20px;margin:0 0 4px}
+.sub{color:var(--muted);margin:0 0 16px;font-size:14px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600}
+td.r,th.r{text-align:right}
+td.num,td.r{white-space:nowrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+.checklist{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.checklist li{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:center}
+.small{font-size:12.5px;color:var(--muted)}
+.delta.up{color:var(--ok)} .delta.down{color:var(--bad)}
+.tag{display:inline-block;font-size:11px;border-radius:4px;padding:1px 6px;background:var(--soft);color:var(--muted);margin-left:6px}
+.tag.ok{background:#e4f1e8;color:var(--ok)} .tag.bad{background:#f6e3e1;color:var(--bad)}
+.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:8px 14px;border-radius:6px;font-size:13px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:40}
+.toast.on{opacity:1}
+.modal{position:fixed;inset:0;background:rgba(20,25,28,.35);display:grid;place-items:center;z-index:50}
+.modal .box{background:#fff;border-radius:10px;padding:18px 20px;max-width:640px;width:calc(100% - 32px)}
+.modal textarea{width:100%;height:240px;font-family:var(--mono);font-size:12px;border:1px solid var(--line);border-radius:6px;padding:8px}
+.modal .acts{display:grid;grid-auto-flow:column;justify-content:end;gap:8px;margin-top:10px}
+footer.cr{font-size:11.5px;color:var(--muted);margin-top:22px;line-height:1.5}
+@media (max-width:900px){
+  :root{--nav:0px}
+  nav{display:none}
+  .wrap{grid-template-columns:1fr}
+  header{grid-template-columns:1fr auto}
+  .meta{grid-column:1/-1;grid-template-columns:repeat(3,1fr);order:3}
+  .dock{grid-template-columns:auto 1fr}
+  .dock .act{display:none}
+  .secbars{display:none}
+  .dock .totbox{border-right:0}
+  .meta{grid-template-columns:1.1fr 1.2fr 1fr;gap:6px}
+  .ihead h2{font-size:18px}
+  .grid2{grid-template-columns:1fr}
+  main{padding:14px 12px 120px}
+  .mobnav{display:grid!important}
+}
+.mobnav{display:none;grid-template-columns:auto 1fr;gap:8px;margin-bottom:12px}
+.mobnav select{height:38px;border:1px solid var(--line);border-radius:6px;padding:0 8px;font:inherit;background:#fff}
+@media print{header,nav,.dock,.pager,.toast,footer.cr{display:none!important}.wrap{display:block}main{padding:0;max-width:none}.card{border:0;padding:0}body{background:#fff}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Équilibre — passation<small>BESTest · Mini-BESTest</small></div>
+  <div class="meta">
+    <label>Code patient<input id="pid" placeholder="ex. P-0142" autocomplete="off"></label>
+    <label>Date<input id="pdate" type="date"></label>
+    <label>Examinateur<input id="pexam" autocomplete="off"></label>
+  </div>
+  <div class="hdr-right">
+    <div class="seg" id="testSeg"><button data-t="mini">Mini</button><button data-t="best">BESTest</button></div>
+  </div>
+</header>
+<div class="wrap">
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+<div class="dock" id="dock"></div>
+<div class="toast" id="toast"></div>
+<script>
+/* ===== SCORING-START ===== */
+const L = a => a.map(([s, t]) => ({ s, t }));
+const num = x => (x === '' || x === null || x === undefined || isNaN(+x)) ? null : +x;
+const best = (...xs) => { const v = xs.map(num).filter(x => x !== null); return v.length ? Math.max(...v) : null; };
+function mean19(t1, t2) {
+  t1 = num(t1); t2 = num(t2);
+  if (t1 === null) return { v: null };
+  if (t1 >= 30) return { v: 30 };
+  if (t2 === null) return { v: t1, note: '2e essai requis (t1 < 30 s) — moyenne des 2 essais' };
+  return { v: Math.min(30, (t1 + t2) / 2), note: 'Moyenne des 2 essais' };
+}
+const pct = (a, b) => (a && b) ? (b - a) / a * 100 : null;
+
+/* ---------- MINI-BESTest (Franchignoni 2010 ; Horak/OHSU ; VF Lemay, Roy & Gagnon) ---------- */
+const MINI = {
+  id: 'mini', name: 'Mini-BESTest', levelsMax: 2,
+  sections: [
+    { id: 'A', name: 'Ajustements posturaux anticipatoires', short: 'APA' },
+    { id: 'R', name: 'Contrôle postural réactif', short: 'Réactif' },
+    { id: 'S', name: 'Orientation sensorielle', short: 'Sensoriel' },
+    { id: 'G', name: 'Marche dynamique', short: 'Marche' }
+  ],
+  stations: [
+    { id: 'chaise', name: 'Chaise sans accoudoirs' },
+    { id: 'debout', name: 'Debout, sol ferme (cible fixe 1,25–3,7 m)' },
+    { id: 'pouss', name: 'Poussées / lâchers (espace libre)' },
+    { id: 'mousse', name: 'Mousse 10 cm' },
+    { id: 'rampe', name: 'Plan incliné 10°' },
+    { id: 'marche', name: 'Couloir de marche + boîte 23 cm' },
+    { id: 'tug', name: 'TUG 3 m (chaise + marque au sol)' }
+  ],
+  materiel: ['Mousse Temper® T41, 10 cm, densité moyenne', 'Chaise ferme sans accoudoirs ni roulettes', 'Plan incliné 10° (≥ 60 × 60 cm)', 'Chronomètre (intégré ici)', 'Boîte de 23 cm de haut (2 boîtes à chaussures)', 'Marque au sol à 3 m de la chaise', 'Chaussures plates OU pieds nus (sans chaussettes)'],
+  rules: ['14 épreuves cotées 0–2, total /28.', 'Aide technique → coter une catégorie en dessous.', 'Assistance physique → 0.', 'Épreuves 3 et 6 : retenir le côté le moins bon.', 'Épreuve 3 : meilleur des 2 essais pour chaque côté.', 'Épreuve 14 : ralentissement > 10 % en double tâche → −1 point.'],
+  items: [
+    { id: 'M1', n: 1, sec: 'A', st: 'chaise', title: 'Assis à debout',
+      patient: 'Croisez vos bras sur votre poitrine. Essayez de ne pas utiliser vos mains sauf si nécessaire. N’appuyez pas vos jambes contre la chaise en vous levant. Levez-vous maintenant.',
+      exam: 'Observer l’initiation du mouvement, le recours aux mains (siège, cuisses) et la projection des bras vers l’avant.',
+      combine: 'single', units: [{ key: 'u', levels: L([[2, 'Se lève sans les mains et se stabilise seul'], [1, 'Se lève du premier coup AVEC les mains'], [0, 'Ne peut se lever sans assistance OU plusieurs tentatives avec les mains']]) }] },
+    { id: 'M2', n: 2, sec: 'A', st: 'debout', title: 'Monter sur la pointe des pieds',
+      patient: 'Pieds à la largeur des épaules, mains sur les hanches. Montez le plus haut possible sur la pointe des pieds. Je compte 3 secondes à voix haute. Regardez droit devant. Allez-y.',
+      exam: 'Deux essais, coter le meilleur. En cas de doute sur la hauteur maximale, refaire en tenant les mains de l’examinateur.',
+      combine: 'single', units: [{ key: 'u', levels: L([[2, 'Stable 3 s à hauteur maximale'], [1, 'Talons levés mais amplitude incomplète OU instabilité marquée pendant 3 s'], [0, '≤ 3 s']]) }] },
+    { id: 'M3', n: 3, sec: 'A', st: 'debout', title: 'Se tenir sur une jambe',
+      patient: 'Regardez droit devant. Mains sur les hanches. Levez une jambe vers l’arrière sans la toucher ni l’appuyer sur l’autre. Restez sur une jambe le plus longtemps possible. Levez maintenant.',
+      exam: '2 essais par côté, max 20 s. Arrêter si les mains quittent les hanches ou si le pied touche le sol. Meilleur essai par côté ; item = côté le moins bon.',
+      combine: 'min', units: ['G', 'D'].map(k => ({ key: k, label: k === 'G' ? 'Gauche' : 'Droite',
+        inputs: [{ type: 'time', key: 't1', label: 'Essai 1', cap: 20 }, { type: 'time', key: 't2', label: 'Essai 2', cap: 20 }],
+        levels: L([[2, '20 s'], [1, '< 20 s'], [0, 'Incapable']]),
+        auto: v => { const b = best(v.t1, v.t2); if (b === null) return null; return { s: b >= 20 ? 2 : b > 0 ? 1 : 0, note: 'Meilleur essai : ' + b.toFixed(1) + ' s' }; } })) },
+    { id: 'M4', n: 4, sec: 'R', st: 'pouss', title: 'Pas compensatoire — antérieur',
+      patient: 'Pieds à la largeur des épaules, bras le long du corps. Penchez-vous vers l’avant contre mes mains au-delà de vos limites. Quand je retire mes mains, faites le nécessaire, y compris un pas, pour ne pas tomber.',
+      exam: 'Face au sujet, une main sur chaque épaule. Épaules et hanches en avant des orteils ; lâcher très subitement quand le poids est dans les mains. Le test doit provoquer un pas. Prêt à rattraper.',
+      combine: 'single', units: [{ key: 'u', levels: L([[2, 'Un seul grand pas, récupération indépendante (2e pas de réalignement permis)'], [1, 'Plus d’un pas nécessaire'], [0, 'Aucun pas OU chuterait si non rattrapé OU chute spontanée']]) }] },
+    { id: 'M5', n: 5, sec: 'R', st: 'pouss', title: 'Pas compensatoire — postérieur',
+      patient: 'Pieds à la largeur des épaules, bras le long du corps. Penchez-vous vers l’arrière contre mes mains au-delà de vos limites. Quand je retire mes mains, faites le nécessaire, y compris un pas, pour ne pas tomber.',
+      exam: 'Derrière le sujet, une main sur chaque omoplate. Épaules et hanches en arrière des talons ; lâcher subitement. Prêt à rattraper.',
+      combine: 'single', units: [{ key: 'u', levels: L([[2, 'Un seul grand pas, récupération indépendante'], [1, 'Plus d’un pas nécessaire'], [0, 'Aucun pas OU chuterait si non retenu OU chute spontanée']]) }] },
+    { id: 'M6', n: 6, sec: 'R', st: 'pouss', title: 'Pas compensatoire — latéral',
+      patient: 'Pieds joints, bras le long du corps. Penchez-vous sur le côté contre ma main au-delà de vos limites. Quand je retire ma main, faites le nécessaire, y compris un pas, pour ne pas tomber.',
+      exam: 'À côté du sujet, main sur le bassin. Pencher jusqu’à ce que le milieu du bassin soit au-dessus du pied, puis lâcher subitement. Item = côté le moins bon.',
+      combine: 'min', units: ['G', 'D'].map(k => ({ key: k, label: k === 'G' ? 'Gauche' : 'Droite', levels: L([[2, 'Un seul pas (croisé ou latéral acceptés)'], [1, 'Plusieurs pas'], [0, 'Chute ou ne peut faire de pas']]) })) },
+    { id: 'M7', n: 7, sec: 'S', st: 'debout', title: 'Pieds joints, yeux ouverts, sol ferme',
+      patient: 'Mains sur les hanches. Pieds joints presque en contact. Regardez droit devant. Restez aussi stable et immobile que possible jusqu’à ce que je dise stop.',
+      exam: 'Max 30 s. Cible fixe à 1,25–3,7 m.',
+      combine: 'single', units: [{ key: 'u', inputs: [{ type: 'time', key: 't', label: 'Temps', cap: 30 }], levels: L([[2, '30 s'], [1, '< 30 s'], [0, 'Incapable']]),
+        auto: v => { const t = num(v.t); if (t === null) return null; return { s: t >= 30 ? 2 : t > 0 ? 1 : 0 }; } }] },
+    { id: 'M8', n: 8, sec: 'S', st: 'mousse', title: 'Pieds joints, yeux fermés, mousse',
+      patient: 'Montez sur la mousse. Mains sur les hanches. Pieds joints presque en contact. Restez aussi stable que possible jusqu’à ce que je dise stop. Je chronomètre dès que vous fermez les yeux.',
+      exam: 'Mousse Temper® 10 cm. Max 30 s. Descendre entre les essais ; retourner la mousse entre chaque essai.',
+      combine: 'single', units: [{ key: 'u', inputs: [{ type: 'time', key: 't', label: 'Temps', cap: 30 }], levels: L([[2, '30 s'], [1, '< 30 s'], [0, 'Incapable']]),
+        auto: v => { const t = num(v.t); if (t === null) return null; return { s: t >= 30 ? 2 : t > 0 ? 1 : 0 }; } }] },
+    { id: 'M9', n: 9, sec: 'S', st: 'rampe', title: 'Plan incliné, yeux fermés',
+      patient: 'Montez sur le plan incliné, orteils vers le haut de la pente. Pieds à la largeur des épaules, bras le long du corps. Je chronomètre dès que vous fermez les yeux.',
+      exam: 'Chronométrer dès la fermeture des yeux. Noter les oscillations excessives et l’alignement (gravité vs surface).',
+      combine: 'single', units: [{ key: 'u', inputs: [{ type: 'time', key: 't', label: 'Temps', cap: 30 }, { type: 'flag', key: 'surf', label: 'S’aligne avec la surface (et non la gravité)' }],
+        levels: L([[2, 'Indépendant 30 s et aligné avec la gravité'], [1, 'Indépendant < 30 s OU s’aligne avec la surface'], [0, 'Incapable']]),
+        auto: v => { const t = num(v.t); if (t === null) return null; if (t <= 0) return { s: 0 }; return { s: (t >= 30 && !v.surf) ? 2 : 1 }; } }] },
+    { id: 'M10', n: 10, sec: 'G', st: 'marche', title: 'Changement de vitesse de marche',
+      patient: 'Marchez à votre vitesse normale. Quand je dirai « vite », marchez le plus vite possible. Quand je dirai « lent », marchez très lentement.',
+      exam: '3–5 pas à vitesse normale → « vite » → 3–5 pas → « lent » → 3–5 pas.',
+      combine: 'single', units: [{ key: 'u', levels: L([[2, 'Change significativement de vitesse sans déséquilibre'], [1, 'Incapable de changer de vitesse OU signes de déséquilibre'], [0, 'Pas de changement significatif ET signes de déséquilibre']]) }] },
+    { id: 'M11', n: 11, sec: 'G', st: 'marche', title: 'Marche avec rotations de tête',
+      patient: 'Marchez à votre vitesse normale. Quand je dirai « droite », tournez la tête à droite ; « gauche », à gauche. Essayez de marcher en ligne droite.',
+      exam: 'Commandes toutes les 3–5 pas. Coter un problème dans l’une ou l’autre direction. Restriction cervicale sévère : tête + tronc autorisés.',
+      combine: 'single', units: [{ key: 'u', levels: L([[2, 'Tourne la tête sans changer de vitesse, bon équilibre'], [1, 'Réduit la vitesse en tournant la tête'], [0, 'Déséquilibres en tournant la tête']]) }] },
+    { id: 'M12', n: 12, sec: 'G', st: 'marche', title: 'Marcher et pivoter',
+      patient: 'Marchez à votre vitesse normale. Quand je dirai « tournez et arrêtez », faites demi-tour aussi vite que possible et arrêtez-vous, pieds rapprochés.',
+      exam: 'Démontrer le pivot. Compter les pas entre « tournez » et la stabilisation. Déséquilibre : base élargie, pas supplémentaires, mouvements du tronc.',
+      combine: 'single', units: [{ key: 'u', inputs: [{ type: 'num', key: 'pas', label: 'Nombre de pas' }, { type: 'flag', key: 'des', label: 'Déséquilibre' }],
+        levels: L([[2, 'Pieds rapprochés, RAPIDE (≤ 3 pas), bon équilibre'], [1, 'Pieds rapprochés, LENT (≥ 4 pas), bon équilibre'], [0, 'Ne peut tourner pieds rapprochés sans déséquilibre']]),
+        auto: v => { if (v.des) return { s: 0 }; const p = num(v.pas); if (p === null) return null; return { s: p <= 3 ? 2 : 1 }; } }] },
+    { id: 'M13', n: 13, sec: 'G', st: 'marche', title: 'Enjamber un obstacle',
+      patient: 'Marchez à votre vitesse normale. Quand vous arrivez à la boîte, passez par-dessus, pas autour, et continuez.',
+      exam: 'Boîte de 23 cm placée à 3 m du départ.',
+      combine: 'single', units: [{ key: 'u', levels: L([[2, 'Enjambe avec un changement minimal de vitesse, bon équilibre'], [1, 'Touche la boîte OU comportement prudent (ralentit)'], [0, 'Incapable d’enjamber OU contourne la boîte']]) }] },
+    { id: 'M14', n: 14, sec: 'G', st: 'tug', title: 'TUG avec double tâche (3 m)', dt: true,
+      patient: 'TUG : quand je dis « go », levez-vous, marchez à vitesse normale jusqu’à la marque, faites demi-tour et revenez vous asseoir. — Double tâche : comptez à rebours de 3 en 3 à voix haute à partir de [N] pendant tout le parcours.',
+      exam: 'Chrono de « go » jusqu’à fesses sur le siège et dos contre le dossier. Tester d’abord le décompte assis (départ 90–100), puis repartir d’un autre nombre et dire « go » après quelques nombres.',
+      combine: 'single', units: [{ key: 'u', inputs: [{ type: 'time', key: 'tug', label: 'TUG simple' }, { type: 'time', key: 'dt', label: 'TUG double tâche' }, { type: 'flag', key: 'cnt', label: 'Décompte perturbé (ralenti, erreurs, hésitations)' }, { type: 'flag', key: 'stop', label: 'Arrête de compter OU de marcher' }],
+        levels: L([[2, 'Pas de changement notable vs TUG simple'], [1, 'La double tâche affecte le décompte OU la marche (> 10 %)'], [0, 'Arrête de compter en marchant OU arrête de marcher en comptant']]),
+        auto: v => {
+          if (v.stop) return { s: 0 };
+          const a = num(v.tug), b = num(v.dt); if (a === null || b === null) return null;
+          const p = pct(a, b), slow = p > 10;
+          let note = 'Δ double tâche : ' + (p >= 0 ? '+' : '') + p.toFixed(1) + ' %' + (slow ? ' (> 10 % → −1)' : '');
+          if (slow && v.cnt) note += ' ; décompte ET marche affectés : non prévu explicitement par l’échelle, cotation proposée 1 (à trancher)';
+          return { s: (slow || v.cnt) ? 1 : 2, note };
+        } }] }
+  ]
+};
+
+/* ---------- BESTest (Horak 2009 ; VF Kubicki) ---------- */
+const lr = k => k === 'G' ? 'Gauche' : 'Droite';
+const BEST = {
+  id: 'best', name: 'BESTest', levelsMax: 3,
+  sections: [
+    { id: 'I', name: 'I. Contraintes biomécaniques', short: 'Biomécanique' },
+    { id: 'II', name: 'II. Limites de stabilité / verticalité', short: 'Limites' },
+    { id: 'III', name: 'III. Ajustements posturaux anticipés', short: 'APA' },
+    { id: 'IV', name: 'IV. Réponses posturales réactives', short: 'Réactif' },
+    { id: 'V', name: 'V. Orientation sensorielle', short: 'Sensoriel' },
+    { id: 'VI', name: 'VI. Stabilité locomotrice', short: 'Marche' }
+  ],
+  stations: [
+    { id: 'exam', name: 'Examen debout (pieds, alignement, cheville, hanche)' },
+    { id: 'sol', name: 'Sol (chaise à proximité)' },
+    { id: 'assis', name: 'Assis sur surface dure' },
+    { id: 'mur', name: 'Mètre ruban au mur' },
+    { id: 'chaise', name: 'Chaise' },
+    { id: 'debout', name: 'Debout, sol ferme' },
+    { id: 'marchep', name: 'Marche d’escalier 15 cm' },
+    { id: 'poids', name: 'Poids 2,5 kg' },
+    { id: 'pouss', name: 'Poussées / lâchers' },
+    { id: 'mousse', name: 'Sol dur / mousse' },
+    { id: 'rampe', name: 'Rampe 10°' },
+    { id: 'marche', name: 'Couloir 6 m + 2 obstacles' },
+    { id: 'tug', name: 'TUG 3 m (chaise à accoudoirs)' }
+  ],
+  materiel: ['Chronomètre (intégré ici)', 'Mètre ruban fixé au mur (Functional Reach)', 'Mousse densité moyenne ≈ 60 × 60 × 10 cm', 'Rampe 10°', 'Marche d’escalier 15 cm', 'Poids 2,5 kg', 'Chaise à accoudoirs', 'Marques au sol à 3 m et 6 m', 'Obstacles pour l’item 25', 'Chaussures plates OU pieds nus (sans chaussettes)'],
+  rules: ['27 items cotés 0–3 (36 unités de cotation), total /108, exprimé en %.', 'Aide technique → une catégorie en dessous.', 'Assistance physique → 0.', 'Items bilatéraux (6, 8, 11, 18) et 19 A–D : les sous-scores s’additionnent.', 'Score par section en % du maximum de la section.'],
+  items: [
+    { id: 'B1', n: 1, sec: 'I', st: 'exam', title: 'Base de support',
+      patient: 'Tenez-vous debout et dites-moi si vous ressentez une douleur aux pieds, aux chevilles ou aux jambes.',
+      exam: 'Examiner les deux pieds : déformations, douleurs, prono-supination anormale, orteils, fascia plantaire, bursite.',
+      combine: 'single', units: [{ key: 'u', levels: L([[3, 'Normal : deux pieds sans déformation ni douleur'], [2, 'Un pied : déformation(s) et/ou douleur'], [1, 'Deux pieds : déformation(s) OU douleur'], [0, 'Deux pieds : déformation(s) ET douleur']]) }] },
+    { id: 'B2', n: 2, sec: 'I', st: 'exam', title: 'Alignement du centre de masse',
+      patient: 'Restez debout et tenez-vous droit.',
+      exam: 'De profil : verticale passant en avant des vertèbres au niveau de l’ombilic et ≈ 2 cm devant la malléole latérale. Scoliose, cyphose, asymétries peuvent l’altérer.',
+      combine: 'single', units: [{ key: 'u', inputs: [{ type: 'flag', key: 'ap', label: 'Anormal antéro-postérieur' }, { type: 'flag', key: 'ml', label: 'Anormal médio-latéral' }, { type: 'flag', key: 'seg', label: 'Segments posturaux anormaux' }],
+        levels: L([[3, 'Alignement normal AP et ML, segments normaux'], [2, 'AP OU ML anormal OU segments anormaux'], [1, 'AP OU ML anormal ET segments anormaux'], [0, 'AP ET ML anormaux']]),
+        auto: v => { if (v.ap && v.ml) return { s: 0 }; const plan = !!(v.ap || v.ml); if (plan && v.seg) return { s: 1 }; if (plan || v.seg) return { s: 2 }; return v._touched ? { s: 3 } : null; } }] },
+    { id: 'B3', n: 3, sec: 'I', st: 'exam', title: 'Force et amplitude de cheville',
+      patient: 'Tenez mes mains et montez sur la pointe des pieds. Tenez 3 s. Descendez puis montez sur les talons en relevant les orteils. Tenez 3 s.',
+      exam: 'Observer la hauteur du talon puis celle des orteils.',
+      combine: 'single', units: [{ key: 'u', levels: L([[3, 'Normal : pointe des pieds hauteur optimale ET talons orteils relevés'], [2, 'Altération des fléchisseurs OU extenseurs (cheville ou orteils)'], [1, 'Altération de deux groupes (ex. fléchisseurs bilatéraux, ou fléch. + ext. d’un pied)'], [0, 'Altération fléchisseurs ET extenseurs des deux chevilles']]) }] },
+    { id: 'B4', n: 4, sec: 'I', st: 'exam', title: 'Force latérale hanche / tronc',
+      patient: 'Prenez mes mains et levez un pied sur le côté, maintenez jusqu’à mon signal. Gardez le tronc bien vertical.',
+      exam: 'Abduction 10 s. Si le patient compense avec vos mains plutôt qu’avec le tronc, coter comme si le tronc ne restait pas vertical.',
+      combine: 'single', units: [{ key: 'u', levels: L([[3, 'Deux hanches : pied décollé 10 s, tronc droit'], [2, 'Deux hanches : pied décollé 10 s, tronc non droit'], [1, 'Une seule hanche correcte (10 s, tronc droit)'], [0, 'Impossible des deux côtés']]) }] },
+    { id: 'B5', n: 5, sec: 'I', st: 'sol', title: 'S’asseoir au sol et se relever',
+      patient: 'Êtes-vous capable de vous asseoir au sol et de vous relever en moins de 2 minutes ? Vous pouvez utiliser la chaise, mais le score sera plus bas. Dites-moi si vous avez besoin d’aide.',
+      exam: 'Assis = fesses au sol. > 2 min (avec ou sans chaise) → 0. Aide nécessaire → 0.',
+      combine: 'single', units: [{ key: 'u', levels: L([[3, 'Descente et relevé seul'], [2, 'Chaise pour descendre OU se relever'], [1, 'Chaise pour descendre ET se relever'], [0, 'N’y parvient pas, > 2 min, ou refuse']]) }] },
+    { id: 'B6', n: 6, sec: 'II', st: 'assis', title: 'Assis : inclinaison latérale et réalignement (yeux fermés)',
+      patient: 'Bras croisés, pieds écartés largeur d’épaules. Fermez les yeux et penchez-vous d’un côté aussi loin que possible, dos droit, sans les mains. Revenez ensuite à la position de départ. Vous pouvez lever une fesse et un pied.',
+      exam: 'Surface dure sans accoudoirs, pieds à plat. Observer le réalignement (overshoot / undershoot). Coter la pire performance de chaque côté. 4 sous-scores additionnés (/12).',
+      combine: 'sum', units: [
+        ...['G', 'D'].map(k => ({ key: 'inc' + k, label: 'Inclinaison ' + lr(k), levels: L([[3, 'Épaule au-delà de la ligne médiane'], [2, 'S’en rapproche sans l’atteindre, ou instabilité'], [1, 'Très faible inclinaison ou instabilité marquée'], [0, 'Pas d’inclinaison ou chute']]) })),
+        ...['G', 'D'].map(k => ({ key: 'rea' + k, label: 'Réalignement ' + lr(k), levels: L([[3, 'Se réaligne avec léger ou sans overshoot'], [2, 'Overshoot important ou undershoot'], [1, 'Impossible de se réaligner'], [0, 'Chute yeux fermés']]) }))] },
+    { id: 'B7', n: 7, sec: 'II', st: 'mur', title: 'Limite de stabilité antérieure (Functional Reach)',
+      patient: 'Levez les deux bras devant vous. Allez le plus loin possible vers l’avant le long du mètre sans lever les talons ni toucher le mur. Revenez. Faites-le deux fois.',
+      exam: 'Bras à 90°, parallèles au mètre. Pas de talons décollés, de rotation du tronc ni de protraction scapulaire excessive. Enregistrer le meilleur essai.',
+      combine: 'single', units: [{ key: 'u', inputs: [{ type: 'num', key: 'd1', label: 'Essai 1 (cm)' }, { type: 'num', key: 'd2', label: 'Essai 2 (cm)' }],
+        levels: L([[3, 'Distance maximale (> 32 cm)'], [2, 'Modérée (16,5–32 cm)'], [1, 'Faible (< 16,5 cm)'], [0, 'Impossible d’aller vers l’avant']]),
+        auto: v => { const d = best(v.d1, v.d2); if (d === null) return null; return { s: d > 32 ? 3 : d >= 16.5 ? 2 : d > 0 ? 1 : 0, note: 'Meilleur essai : ' + d + ' cm' }; } }] },
+    { id: 'B8', n: 8, sec: 'II', st: 'mur', title: 'Limite de stabilité latérale',
+      patient: 'Pieds écartés largeur d’épaules, bras tendus sur les côtés à hauteur d’épaules. Étirez-vous le plus loin possible sur le côté sans décoller les orteils.',
+      exam: 'Bras à 90° d’abduction, bout des doigts au 0 du mètre. Départ en position neutre. Un talon peut décoller, pas le pied entier. Meilleur essai par côté ; sous-scores additionnés.',
+      combine: 'sum', units: ['G', 'D'].map(k => ({ key: k, label: lr(k), inputs: [{ type: 'num', key: 'd1', label: 'Essai 1 (cm)' }, { type: 'num', key: 'd2', label: 'Essai 2 (cm)' }],
+        levels: L([[3, 'Maximale (> 25 cm)'], [2, 'Modérée (10–25,5 cm)'], [1, 'Faible (< 10 cm)'], [0, 'Impossible']]),
+        auto: v => { const d = best(v.d1, v.d2); if (d === null) return null; return { s: d > 25.5 ? 3 : d >= 10 ? 2 : d > 0 ? 1 : 0, note: 'Meilleur essai : ' + d + ' cm' + ((d > 25 && d <= 25.5) ? ' — chevauchement des bornes de la fiche (> 25 / 10–25,5) : cotation 2 retenue' : '') }; } })) },
+    { id: 'B9', n: 9, sec: 'III', st: 'chaise', title: 'Assis-debout',
+      patient: 'Croisez les bras. Essayez de ne pas les utiliser pour vous lever sauf si nécessaire. Ne laissez pas vos jambes en appui sur la chaise. Levez-vous maintenant.',
+      exam: 'Initiation, usage des accoudoirs, projection des bras vers l’avant.',
+      combine: 'single', units: [{ key: 'u', levels: L([[3, 'Debout sans les mains, se stabilise seul'], [2, 'Debout au 1er essai avec les mains'], [1, 'Plusieurs essais OU assistance minimale OU touche la chaise pour se stabiliser'], [0, 'Aide importante pour se lever']]) }] },
+    { id: 'B10', n: 10, sec: 'III', st: 'debout', title: 'Monter sur la pointe des pieds',
+      patient: 'Pieds largeur d’épaules, mains sur les hanches. Montez sur la pointe des pieds aussi haut que possible. Je compte jusqu’à 3, tenez les 3 secondes.',
+      exam: 'Deux essais, meilleur score. Cible à plusieurs mètres.',
+      combine: 'single', units: [{ key: 'u', levels: L([[3, 'Stable 3 s, hauteur optimale'], [2, 'Stable 3 s hauteur diminuée OU instabilité avec hauteur optimale'], [1, 'Tenue < 3 s'], [0, 'Instable']]) }] },
+    { id: 'B11', n: 11, sec: 'III', st: 'debout', title: 'Se tenir sur un pied',
+      patient: 'Regardez loin devant, mains sur les hanches. Levez une jambe sans la mettre en contact avec l’autre. Restez ainsi aussi longtemps que possible.',
+      exam: '2 essais par côté, meilleur essai, jusqu’à 30 s. Arrêter si mains/hanches bougent ou pied au sol. Sous-scores G + D additionnés.',
+      combine: 'sum', units: ['G', 'D'].map(k => ({ key: k, label: lr(k), inputs: [{ type: 'time', key: 't1', label: 'Essai 1', cap: 30 }, { type: 'time', key: 't2', label: 'Essai 2', cap: 30 }, { type: 'flag', key: 'tr', label: 'Mouvements du tronc' }],
+        levels: L([[3, 'Stable > 20 s'], [2, 'Mouvements du tronc OU 10–20 s'], [1, '2–10 s'], [0, 'Impossible']]),
+        auto: v => { const b = best(v.t1, v.t2); if (b === null) return null; let s = b > 20 ? 3 : b >= 10 ? 2 : b >= 2 ? 1 : 0; if (v.tr && s === 3) s = 2; return { s, note: 'Meilleur essai : ' + b.toFixed(1) + ' s' + (b === 20 ? ' — 20 s pile : « > 20 s » exigé pour 3' : '') }; } })) },
+    { id: 'B12', n: 12, sec: 'III', st: 'marchep', title: 'Montées alternées sur une marche',
+      patient: 'Mains sur les hanches. Posez vos pieds alternativement sur la marche jusqu’à ce que chaque pied l’ait touchée 4 fois (8 pas). Je chronomètre.',
+      exam: 'Marche standard (15 cm). Le sujet peut regarder ses pieds.',
+      combine: 'single', units: [{ key: 'u', inputs: [{ type: 'num', key: 'pas', label: 'Nombre de pas' }, { type: 'time', key: 't', label: 'Durée' }, { type: 'flag', key: 'ins', label: 'Instabilité / placement approximatif / hésitations' }],
+        levels: L([[3, '8 pas < 10 s, sans aide, stable'], [2, '8 pas en 10–20 s ET/OU instabilité, hésitations, arythmie'], [1, '< 8 pas sans assistance minimale OU > 20 s pour 8 pas'], [0, '< 8 pas même avec aide technique']]),
+        auto: v => { const p = num(v.pas), t = num(v.t); if (p === null) return null; if (p < 8) return { s: 1, note: '< 8 pas : 0 si même avec aide technique' }; if (t === null) return null; if (t > 20) return { s: 1 }; if (t >= 10 || v.ins) return { s: 2 }; return { s: 3 }; } }] },
+    { id: 'B13', n: 13, sec: 'III', st: 'poids', title: 'Pointage du membre supérieur (poids 2,5 kg)',
+      patient: 'Montez ce poids avec vos deux mains tendues devant vous jusqu’à hauteur des épaules, le plus vite possible, et tenez 3 s.',
+      exam: 'Diminuer d’une catégorie si poids < 2,5 kg ou élévation < 75°.',
+      combine: 'single', units: [{ key: 'u', inputs: [{ type: 'flag', key: 'red', label: 'Poids < 2,5 kg OU élévation < 75° (−1)' }],
+        levels: L([[3, 'Reste stable'], [2, 'Oscillations visibles'], [1, 'Fait un pas OU incapable de bouger rapidement le bras'], [0, 'Impossible ou besoin d’aide']]), penalty: v => v.red ? 1 : 0 }] },
+    { id: 'B14', n: 14, sec: 'IV', st: 'pouss', title: 'Réponse sur place — vers l’arrière',
+      patient: 'Je vais vous pousser pour tester vos réactions. Pieds écartés largeur d’épaules. Ne me laissez pas vous emmener vers l’arrière. Quand je lâche, retrouvez l’équilibre sans faire de pas.',
+      exam: 'Face au patient, mains sur les épaules, pousser vers l’arrière jusqu’à contraction des releveurs (orteils qui se soulèvent), puis relâcher. Pas de pré-inclinaison. Meilleur de 2 essais si mal préparé.',
+      combine: 'single', units: [{ key: 'u', levels: L([[3, 'Récupère aux chevilles, sans bras ni hanches'], [2, 'Récupère avec mouvement des bras ou des hanches'], [1, 'Pas (réaction parachute) d’un membre inférieur'], [0, 'Doit être rattrapé OU aide OU ne réagit pas']]) }] },
+    { id: 'B15', n: 15, sec: 'IV', st: 'pouss', title: 'Réponse sur place — vers l’avant',
+      patient: 'Pieds écartés largeur d’épaules, bras sur le côté. Empêchez-moi de vous pousser vers l’avant. Quand je lâche, retrouvez l’équilibre sans faire de pas.',
+      exam: 'Derrière, mains sur les scapulas, poussée isométrique jusqu’à ce que les talons soient sur le point de décoller, puis relâcher.',
+      combine: 'single', units: [{ key: 'u', levels: L([[3, 'Récupère aux chevilles, sans bras ni hanches'], [2, 'Récupère avec mouvement des bras ou des hanches'], [1, 'Pas d’un membre inférieur'], [0, 'Doit être rattrapé OU aide OU ne réagit pas']]) }] },
+    { id: 'B16', n: 16, sec: 'IV', st: 'pouss', title: 'Pas compensatoire — vers l’avant',
+      patient: 'Inclinez-vous vers l’avant jusqu’à la limite. Quand je lâche, faites le nécessaire, y compris un pas en avant, pour éviter la chute.',
+      exam: 'Face au patient, mains sur les épaules ; épaules et hanches devant les chevilles ; relâcher subitement. Prêt à rattraper.',
+      combine: 'single', units: [{ key: 'u', levels: L([[3, 'Un seul grand pas (± 2e de réalignement)'], [2, 'Plus d’un pas OU un pas avec forte instabilité'], [1, 'Plusieurs pas et instabilité OU assistance pour éviter la chute'], [0, 'Aucun pas, chute si non rattrapé']]) }] },
+    { id: 'B17', n: 17, sec: 'IV', st: 'pouss', title: 'Pas compensatoire — vers l’arrière',
+      patient: 'Inclinez-vous vers l’arrière jusqu’à la limite. Quand je lâche, faites le nécessaire, y compris un pas en arrière, pour éviter la chute.',
+      exam: 'Derrière, mains sur les scapulas ; épaules et hanches derrière les talons ; relâcher subitement.',
+      combine: 'single', units: [{ key: 'u', levels: L([[3, 'Un seul grand pas (± 2e de réalignement)'], [2, 'Plus d’un pas OU un pas avec forte instabilité'], [1, 'Plusieurs pas et instabilité OU assistance'], [0, 'Aucun pas, chute si non rattrapé']]) }] },
+    { id: 'B18', n: 18, sec: 'IV', st: 'pouss', title: 'Pas compensatoire — latéral',
+      patient: 'Pieds joints, bras le long du tronc. Penchez-vous vers ma main jusqu’à la limite. Quand je lâche, faites un pas si nécessaire.',
+      exam: 'Main sur le bassin ; bassin au-dessus du pied ; relâcher subitement. Sous-scores G + D additionnés.',
+      combine: 'sum', units: ['G', 'D'].map(k => ({ key: k, label: lr(k), levels: L([[3, 'Un pas de longueur et largeur normales'], [2, 'Plusieurs pas, stabilisation seul'], [1, 'Plusieurs pas, aide nécessaire'], [0, 'Chute, aucun pas']]) })) },
+    { id: 'B19', n: 19, sec: 'V', st: 'mousse', title: 'Intégration sensorielle (CTSIB modifié)',
+      patient: 'Mains sur les hanches, pieds joints en contact. Restez aussi stable que possible jusqu’à mon signal.',
+      exam: 'Dans l’ordre A → D. Max 30 s ; si < 30 s, refaire et moyenner. Pause en descendant de la mousse. Inclinaison / flexion-extension du tronc = instabilité. Sous-scores additionnés (/12).',
+      combine: 'sum', units: [['A', 'Yeux ouverts, sol dur'], ['B', 'Yeux fermés, sol dur'], ['C', 'Yeux ouverts, mousse'], ['D', 'Yeux fermés, mousse']].map(([k, lab]) => ({ key: k, label: k + ' — ' + lab,
+        inputs: [{ type: 'time', key: 't1', label: 'Essai 1', cap: 30 }, { type: 'time', key: 't2', label: 'Essai 2', cap: 30 }, { type: 'flag', key: 'ins', label: 'Instable' }],
+        levels: L([[3, '30 s'], [2, '30 s, instable'], [1, '< 30 s'], [0, 'Impossible']]),
+        auto: v => { const m = mean19(v.t1, v.t2); if (m.v === null) return null; const s = m.v >= 30 ? (v.ins ? 2 : 3) : m.v > 0 ? 1 : 0; return { s, note: (m.note ? m.note + ' : ' : 'Retenu : ') + m.v.toFixed(1) + ' s', provisional: !!(m.note && m.note.startsWith('2e')) }; } })) },
+    { id: 'B20', n: 20, sec: 'V', st: 'rampe', title: 'Rampe inclinée, yeux fermés',
+      patient: 'Montez sur la rampe, orteils vers le haut. Pieds largeur d’épaules, mains sur les hanches. Je chronomètre dès que vous fermez les yeux.',
+      exam: 'Si < 30 s, répéter et moyenner. Noter si oscillations > item 19-B ou mauvais alignement à la verticale.',
+      combine: 'single', units: [{ key: 'u', inputs: [{ type: 'time', key: 't1', label: 'Essai 1', cap: 30 }, { type: 'time', key: 't2', label: 'Essai 2', cap: 30 }, { type: 'flag', key: 'osc', label: 'Oscillations > 19-B ou mal aligné' }, { type: 'flag', key: 'tch', label: 'Besoin d’un contact' }],
+        levels: L([[3, 'Seul 30 s, sans oscillation importante, aligné sur la verticale'], [2, 'Seul 30 s AVEC oscillations > 19-B'], [1, 'Besoin d’un contact OU seul 10–20 s'], [0, '< 10 s OU aide physique importante']]),
+        auto: v => { const m = mean19(v.t1, v.t2); if (m.v === null) return null; const t = m.v; let s, note = (m.note ? m.note + ' : ' : 'Retenu : ') + t.toFixed(1) + ' s';
+          if (t < 10) s = 0; else if (v.tch) s = 1; else if (t >= 30) s = v.osc ? 2 : 3; else { s = 1; if (t > 20) note += ' — 20–30 s non prévu par la fiche : cotation conservatrice 1'; }
+          return { s, note, provisional: !!(m.note && m.note.startsWith('2e')) }; } }] },
+    { id: 'B21', n: 21, sec: 'VI', st: 'marche', title: 'Marche simple (6 m)',
+      patient: 'Marchez à votre vitesse naturelle d’ici jusqu’à dépasser la marque en face de vous.',
+      exam: 'Départ orteils sur la 1re marque. Chrono au décollement du 1er pied, arrêt quand les deux pieds s’immobilisent après l’arrivée.',
+      combine: 'single', units: [{ key: 'u', inputs: [{ type: 'time', key: 't', label: 'Temps 6 m' }, { type: 'flag', key: 'ins', label: 'Instabilités (base élargie, tronc, pas variables)' }, { type: 'flag', key: 'sev', label: 'Impossible sans assistance / déviations ou instabilités sévères' }],
+        levels: L([[3, '≥ 6 m à ≥ 1,1 m/s, sans instabilité'], [2, '≥ 6 m, < 1,1 m/s, sans instabilité'], [1, '≥ 6 m avec instabilités'], [0, 'Impossible sans assistance OU déviations / instabilités sévères']]),
+        auto: v => { if (v.sev) return { s: 0 }; const t = num(v.t); if (t === null || t <= 0) return null; const sp = 6 / t; if (v.ins) return { s: 1, note: 'Vitesse : ' + sp.toFixed(2) + ' m/s' }; return { s: sp >= 1.1 ? 3 : 2, note: 'Vitesse : ' + sp.toFixed(2) + ' m/s' }; } }] },
+    { id: 'B22', n: 22, sec: 'VI', st: 'marche', title: 'Changement de vitesse de marche',
+      patient: 'Marchez à votre vitesse naturelle jusqu’à la marque devant vous.',
+      exam: '2–3 pas normaux → « plus vite » → 2–3 pas → « ralentissez » → 2–3 pas lents.',
+      combine: 'single', units: [{ key: 'u', levels: L([[3, 'Changements significatifs sans instabilité'], [2, 'Impossible de changer de vitesse sans instabilités'], [1, 'Change de vitesse mais importantes instabilités'], [0, 'Impossible de changer de vitesse ET instabilités']]) }] },
+    { id: 'B23', n: 23, sec: 'VI', st: 'marche', title: 'Marche avec rotations cervicales',
+      patient: 'Marchez à vitesse normale ; « droite » : tournez la tête loin à droite ; « gauche » : à gauche. Gardez une trajectoire rectiligne.',
+      exam: 'Regard derrière l’épaule sur 2–3 pas. Restriction cervicale : compensation par le tronc autorisée.',
+      combine: 'single', units: [{ key: 'u', levels: L([[3, 'Sans changement de vitesse ni instabilité'], [2, 'Réduction de la vitesse'], [1, 'Instabilités'], [0, 'Lentement ET instabilités ET/OU amplitude incomplète']]) }] },
+    { id: 'B24', n: 24, sec: 'VI', st: 'marche', title: 'Marche avec demi-tour',
+      patient: 'Marchez à vitesse normale. Quand je dis de faire demi-tour, faites-le le plus vite possible et arrêtez-vous, pieds joints.',
+      exam: 'Démonstration préalable. Compter les pas du début du demi-tour à la stabilisation.',
+      combine: 'single', units: [{ key: 'u', inputs: [{ type: 'num', key: 'pas', label: 'Nombre de pas' }, { type: 'flag', key: 'ins', label: 'Instabilités' }],
+        levels: L([[3, 'Pieds rapprochés, rapide (< 3 pas), bonne stabilité'], [2, 'Pieds rapprochés, lent (< 4 pas), bonne stabilité'], [1, 'Pieds rapprochés avec instabilités'], [0, 'Ne tourne pas pieds rapprochés ET instabilités']]),
+        auto: v => { const p = num(v.pas); if (v.ins) return { s: 1, note: '0 si ne tourne pas pieds rapprochés' }; if (p === null) return null; if (p < 3) return { s: 3 }; if (p < 4) return { s: 2 }; return { s: 2, note: '≥ 4 pas sans instabilité : non prévu par la fiche VF (« < 4 pas ») — 2 proposé, à trancher' }; } }] },
+    { id: 'B25', n: 25, sec: 'VI', st: 'marche', title: 'Marche avec obstacles',
+      patient: 'Marchez à vitesse normale. Passez par-dessus les obstacles.',
+      exam: 'Obstacles à 3 m. Noter hésitations, petits pas, contacts.',
+      combine: 'single', units: [{ key: 'u', levels: L([[3, 'Passe les deux obstacles sans changer de vitesse ni instabilité'], [2, 'Passe avec ralentissement, sans instabilité'], [1, 'Passe avec instabilités OU contact'], [0, 'Impossible ET ralentissement OU assistance']]) }] },
+    { id: 'B26', n: 26, sec: 'VI', st: 'tug', title: 'Timed Up and Go',
+      patient: 'Quand je dis GO, levez-vous, marchez à vitesse normale jusqu’à la marque, faites le tour et revenez vous asseoir.',
+      exam: 'Départ dos contre le dossier. Chrono de GO jusqu’aux fesses sur l’assise. Chaise fixe (accoudoirs utilisables).',
+      combine: 'single', units: [{ key: 'u', inputs: [{ type: 'time', key: 't', label: 'TUG' }, { type: 'flag', key: 'ins', label: 'Instabilités' }],
+        levels: L([[3, 'Rapide (< 11 s) sans instabilité'], [2, 'Lent (> 11 s) sans instabilité'], [1, 'Rapide (< 11 s) avec instabilités'], [0, 'Lent (> 11 s) ET instabilités']]),
+        auto: v => { const t = num(v.t); if (t === null) return null; const fast = t < 11; return { s: fast ? (v.ins ? 1 : 3) : (v.ins ? 0 : 2), note: t === 11 ? '11 s pile : classé « lent »' : '' }; } }] },
+    { id: 'B27', n: 27, sec: 'VI', st: 'tug', title: 'TUG avec double tâche', dt: true,
+      patient: 'Décomptez de 3 en 3 à partir de [N] et quand je dis GO, levez-vous, marchez jusqu’à la marque, faites le tour et revenez vous asseoir en continuant à compter.',
+      exam: 'Entraîner d’abord le décompte (départ 90–100), puis repartir d’un autre nombre et dire GO après quelques nombres. Comparé au TUG de l’item 26.',
+      combine: 'single', units: [{ key: 'u', inputs: [{ type: 'time', key: 't', label: 'TUG double tâche' }, { type: 'flag', key: 'cnt', label: 'Décompte perturbé (ralenti, hésitations, erreurs)' }, { type: 'flag', key: 'stop', label: 'Impossible de décompter en marchant / arrête de marcher' }],
+        levels: L([[3, 'Pas de changement notable (décompte, vitesse)'], [2, 'Décompte perturbé OU ralentissement > 10 %'], [1, 'Décompte perturbé ET ralentissement > 10 %'], [0, 'Impossible de décompter en marchant ou arrête de marcher']]),
+        auto: (v, all) => { if (v.stop) return { s: 0 }; const b = num(v.t), a = num(all && all.B26 && all.B26.u && all.B26.u.t); if (b === null) return null; if (a === null) return { s: null, note: 'Saisir le TUG simple (item 26)' }; const p = pct(a, b), slow = p > 10; return { s: slow && v.cnt ? 1 : (slow || v.cnt) ? 2 : 3, note: 'Δ vs TUG simple : ' + (p >= 0 ? '+' : '') + p.toFixed(1) + ' %' }; } }] }
+  ]
+};
+const TESTS = { mini: MINI, best: BEST };
+
+/* ---------- moteur de cotation ---------- */
+function unitMax(u) { return Math.max(...u.levels.map(l => l.s)); }
+function itemMax(it) { return it.combine === 'sum' ? it.units.reduce((a, u) => a + unitMax(u), 0) : unitMax(it.units[0]); }
+function unitScore(test, it, u, st) {
+  const vals = (st.values[it.id] || {})[u.key] || {};
+  const ov = ((st.override[it.id] || {})[u.key]);
+  let sug = null;
+  if (u.auto) { const r = u.auto(vals, st.values); if (r && r.s !== null && r.s !== undefined) sug = r; else if (r) sug = { s: null, note: r.note }; }
+  let raw = (ov !== undefined && ov !== null) ? ov : (sug ? sug.s : null);
+  if (raw === null || raw === undefined) return { raw: null, final: null, sug };
+  const mods = st.mods[it.id] || {};
+  let f = raw;
+  if (u.penalty) f -= u.penalty(vals);
+  if (mods.aide) f -= 1;
+  if (mods.assist) f = 0;
+  f = Math.max(0, f);
+  return { raw, final: f, sug, overridden: ov !== undefined && ov !== null && sug && sug.s !== null && ov !== sug.s };
+}
+function itemScore(test, it, st) {
+  const us = it.units.map(u => unitScore(test, it, u, st));
+  if (us.some(x => x.final === null)) return { score: null, units: us };
+  const fs = us.map(x => x.final);
+  const score = it.combine === 'min' ? Math.min(...fs) : fs.reduce((a, b) => a + b, 0);
+  return { score, units: us };
+}
+function totals(test, st) {
+  const sec = {}; test.sections.forEach(s => sec[s.id] = { score: 0, max: 0, done: 0, n: 0 });
+  let total = 0, max = 0, done = 0;
+  test.items.forEach(it => { const r = itemScore(test, it, st); const m = itemMax(it); const S = sec[it.sec]; S.max += m; S.n++; max += m;
+    if (r.score !== null) { S.score += r.score; S.done++; total += r.score; done++; } });
+  return { total, max, done, n: test.items.length, sec };
+}
+
+</script>
+<script>
+(function(){
+const LSKEY='bestest_app_v1';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const today=()=>new Date().toISOString().slice(0,10);
+const blank=()=>({values:{},override:{},mods:{},notes:{}});
+let app={test:'mini',order:'station',view:'item',cur:{mini:'M1',best:'B1'},meta:{pid:'',date:today(),exam:''},
+  sess:{mini:blank(),best:blank()},history:[],dtN:{mini:null,best:null},check:{}};
+let storageOK=true;
+try{const raw=localStorage.getItem(LSKEY);if(raw){const o=JSON.parse(raw);app=Object.assign(app,o);}}catch(e){storageOK=false;}
+function save(){try{localStorage.setItem(LSKEY,JSON.stringify(app));}catch(e){storageOK=false;}}
+const T=()=>TESTS[app.test];
+const S=()=>app.sess[app.test];
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),1800);}
+
+/* ---------- ordre ---------- */
+function ordered(){
+  const t=T(); if(app.order==='official') return t.items.slice();
+  const out=[]; t.stations.forEach(s=>t.items.filter(i=>i.st===s.id).forEach(i=>out.push(i))); return out;
+}
+function groups(){
+  const t=T();
+  if(app.order==='official') return t.sections.map(s=>({name:s.name,items:t.items.filter(i=>i.sec===s.id)}));
+  return t.stations.map(s=>({name:s.name,items:t.items.filter(i=>i.st===s.id)})).filter(g=>g.items.length);
+}
+
+/* ---------- chrono ---------- */
+let run=null; let actx=null;
+function beep(){try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.frequency.value=880;g.gain.value=.15;o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+.25);}catch(e){}}
+function toggleChrono(itemId,uk,key,cap){
+  try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();}catch(e){}
+  if(run && run.id===itemId+uk+key){stopChrono(false);return;}
+  if(run) stopChrono(false);
+  run={id:itemId+uk+key,itemId,uk,key,cap,t0:performance.now()};
+  run.h=setInterval(tick,100); tick();
+}
+function tick(){ if(!run) return; const el=document.querySelector('[data-chrono="'+run.id+'"]'); const t=(performance.now()-run.t0)/1000;
+  if(run.cap && t>=run.cap){stopChrono(true);return;}
+  if(el){el.textContent='■ '+t.toFixed(1);el.classList.add('run');} }
+function stopChrono(capped){ const r=run; if(!r) return; clearInterval(r.h); run=null;
+  let t=(performance.now()-r.t0)/1000; if(capped){t=r.cap;beep();}
+  setVal(r.itemId,r.uk,r.key,Math.round(t*10)/10); }
+
+/* ---------- état ---------- */
+function setVal(id,uk,key,v){const s=S();s.values[id]=s.values[id]||{};s.values[id][uk]=s.values[id][uk]||{};s.values[id][uk][key]=v;s.values[id][uk]._touched=true;save();render();}
+function setOv(id,uk,v){const s=S();s.override[id]=s.override[id]||{};if(s.override[id][uk]===v)delete s.override[id][uk];else s.override[id][uk]=v;save();render();}
+function setMod(id,k,v){const s=S();s.mods[id]=s.mods[id]||{};s.mods[id][k]=v;save();render();}
+
+/* ---------- rendu nav ---------- */
+function badge(it){const r=itemScore(T(),it,S());const m=itemMax(it);
+  const any=r.units.some(u=>u.final!==null);
+  const cls=r.score!==null?'done':any?'part':'';
+  return '<span class="badge num '+cls+'">'+(r.score!==null?r.score:'–')+'/'+m+'</span>';}
+function renderNav(){
+  const v=app.view;
+  let h='<div class="navtabs">'+[['item','Items'],['materiel','Matériel'],['synthese','Synthèse'],['historique','Suivi']].map(([k,l])=>'<button data-view="'+k+'" class="'+(v===k?'on':'')+'">'+l+'</button>').join('')+'</div>';
+  h+='<div class="order"><span>Ordre de passation</span><div class="seg" id="ordSeg"><button data-o="station" class="'+(app.order==='station'?'on':'')+'">Postes</button><button data-o="official" class="'+(app.order==='official'?'on':'')+'">Officiel</button></div></div>';
+  groups().forEach(g=>{const done=g.items.filter(i=>itemScore(T(),i,S()).score!==null).length;
+    h+='<div class="grp"><span>'+esc(g.name)+'</span><span class="num">'+done+'/'+g.items.length+'</span></div>';
+    g.items.forEach(it=>{h+='<button class="row'+(app.view==='item'&&app.cur[app.test]===it.id?' cur':'')+'" data-go="'+it.id+'"><span class="n num">'+it.n+'</span><span>'+esc(it.title)+'</span><span class="sc">'+badge(it)+'</span></button>';});});
+  $('#nav').innerHTML=h;
+}
+
+/* ---------- rendu item ---------- */
+function inputHTML(it,u,inp){
+  const vals=((S().values[it.id]||{})[u.key])||{}; const v=vals[inp.key];
+  const id=it.id+u.key+inp.key;
+  if(inp.type==='flag') return '<label class="flag"><input type="checkbox" data-flag="'+it.id+'|'+u.key+'|'+inp.key+'" '+(v?'checked':'')+'><span>'+esc(inp.label)+'</span></label>';
+  const chrono=inp.type==='time';
+  const runNow=run&&run.id===id;
+  return '<div class="fld"><span>'+esc(inp.label)+(chrono?' (s)':'')+(inp.cap?' · max '+inp.cap+' s':'')+'</span><div class="ctl'+(chrono?'':' nochrono')+'"><input type="number" inputmode="decimal" step="0.1" min="0" data-num="'+it.id+'|'+u.key+'|'+inp.key+'" value="'+(v==null?'':v)+'">'+
+    (chrono?'<button class="chrono'+(runNow?' run':'')+'" data-chrono="'+id+'" data-ch="'+it.id+'|'+u.key+'|'+inp.key+'|'+(inp.cap||0)+'">'+(runNow?'■':'▶ chrono')+'</button>':'')+'</div></div>';
+}
+function dtNumber(){ if(!app.dtN[app.test]){const a=90+Math.floor(Math.random()*11);let b;do{b=90+Math.floor(Math.random()*11);}while(b===a);app.dtN[app.test]=[a,b];save();} return app.dtN[app.test]; }
+function renderItem(){
+  const t=T(), list=ordered(); let it=t.items.find(i=>i.id===app.cur[app.test])||list[0];
+  const idx=list.indexOf(it); const r=itemScore(t,it,S()); const m=itemMax(it);
+  const sec=t.sections.find(s=>s.id===it.sec), st=t.stations.find(s=>s.id===it.st);
+  let h='<div class="mobnav"><button class="btn sm" data-view="synthese">Synthèse</button><select id="mobsel">'+list.map(i=>'<option value="'+i.id+'"'+(i===it?' selected':'')+'>'+i.n+'. '+esc(i.title)+'</option>').join('')+'</select></div>';
+  h+='<div class="card"><div class="ihead"><span class="no num">'+it.n+'</span><h2>'+esc(it.title)+'<span class="crumb">'+esc(sec.name)+' · Poste : '+esc(st.name)+'</span></h2><span class="tot num">'+(r.score!==null?r.score:'–')+'<span style="color:var(--muted)">/'+m+'</span><small>score item</small></span></div>';
+  let say=it.patient;
+  if(it.dt){const [a,b]=dtNumber(); say=say.replace('[N]','<b style="display:inline;font-size:inherit;text-transform:none;letter-spacing:0;color:var(--ink)">'+b+'</b>');
+    h+='<div class="dtnum"><span>Entraînement assis à partir de</span><span class="big num">'+a+'</span><span>puis passation à partir de <b class="num">'+b+'</b> <button class="btn sm" id="reroll">↻</button></span></div>';}
+  h+='<p class="say"><b>Consigne au patient</b>'+(it.dt?say:esc(say))+'</p>';
+  h+='<details class="exam"'+(app.examOpen?' open':'')+'><summary>Consignes examinateur</summary><p>'+esc(it.exam)+'</p></details>';
+  it.units.forEach((u,k)=>{const us=r.units[k];
+    const ov=((S().override[it.id]||{})[u.key]);
+    h+='<div class="unit">'+(it.units.length>1||u.label?'<h3><span>'+esc(u.label||'')+'</span><span class="num">'+(us.final!==null?us.final:'–')+'/'+Math.max(...u.levels.map(l=>l.s))+'</span></h3>':'');
+    if(u.inputs){const nums=u.inputs.filter(i=>i.type!=='flag'),fl=u.inputs.filter(i=>i.type==='flag');if(nums.length)h+='<div class="inputs">'+nums.map(inp=>inputHTML(it,u,inp)).join('')+'</div>';if(fl.length)h+='<div class="flags">'+fl.map(inp=>inputHTML(it,u,inp)).join('')+'</div>';}
+    h+='<div class="levels">'+u.levels.map(l=>{const sel=us.raw===l.s; const sug=us.sug&&us.sug.s===l.s&&(ov===undefined||ov===null);
+      return '<button class="lvl'+(sel?' sel':'')+(sug&&!sel?' sug':'')+'" data-ov="'+it.id+'|'+u.key+'|'+l.s+'"><span class="s">'+l.s+'</span><span>'+esc(l.t)+'</span></button>';}).join('')+'</div>';
+    if(us.sug&&us.sug.note) h+='<div class="note'+(us.sug.provisional?'':' info')+'">'+esc(us.sug.note)+'</div>';
+    if(us.overridden) h+='<div class="note">Cotation manuelle ('+us.raw+') différente de la proposition automatique ('+us.sug.s+'). Recliquer pour annuler.</div>';
+    if(u.penalty&&us.raw!==null&&u.penalty(((S().values[it.id]||{})[u.key])||{})) h+='<div class="note">−1 appliqué (poids/amplitude réduits).</div>';
+    h+='</div>';});
+  const md=S().mods[it.id]||{};
+  h+='<div class="mods"><label class="flag"><input type="checkbox" data-mod="'+it.id+'|aide" '+(md.aide?'checked':'')+'><span>Aide technique (−1 catégorie)</span></label><label class="flag"><input type="checkbox" data-mod="'+it.id+'|assist" '+(md.assist?'checked':'')+'><span>Assistance physique (→ 0)</span></label></div>';
+  h+='<textarea class="free" data-note="'+it.id+'" placeholder="Observations qualitatives (stratégie, côté, peur, douleur…)">'+esc((S().notes||{})[it.id]||'')+'</textarea>';
+  h+='</div><div class="pager"><button class="btn" data-step="-1" '+(idx<=0?'disabled':'')+'>← Précédent</button><span class="kb">Clavier : 0–3 cote · ← → navigue · Espace chrono</span><button class="btn pri" data-step="1">'+(idx>=list.length-1?'Synthèse →':'Suivant →')+'</button></div>';
+  h+=copyright();
+  $('#main').innerHTML=h;
+}
+function copyright(){return '<footer class="cr">BESTest © 2008 F. Horak / Oregon Health & Science University — adaptation française A. Kubicki (INSERM U1093). Mini-BESTest © 2005–2013 OHSU (Franchignoni et al., 2010) — version française J.-F. Lemay, A. Roy, D. H. Gagnon. Fiches originales et conditions d’utilisation : bestest.us. Outil d’aide à la passation : les règles automatiques reproduisent les fiches ; la cotation retenue reste celle du clinicien. Aucune connexion réseau : les données restent dans ce navigateur, sur cet appareil. Exporter régulièrement (JSON) comme sauvegarde.</footer>';}
+
+/* ---------- synthèse ---------- */
+function summaryData(testId,st){const t=TESTS[testId];const tt=totals(t,st);return {t,tt};}
+function renderSynth(){
+  const {t,tt}=summaryData(app.test,S());
+  let h='<h1 class="v">Synthèse — '+t.name+'</h1><p class="sub">'+esc(app.meta.pid||'Patient non renseigné')+' · '+esc(app.meta.date||'')+' · '+tt.done+'/'+tt.n+' items cotés</p>';
+  h+='<div class="card"><table><thead><tr><th>Section</th><th class="r">Score</th><th class="r">Max</th><th class="r">%</th><th style="width:38%"></th></tr></thead><tbody>';
+  t.sections.forEach(s=>{const x=tt.sec[s.id];const p=x.max?x.score/x.max*100:0;
+    h+='<tr><td>'+esc(s.name)+(x.done<x.n?'<span class="tag">'+x.done+'/'+x.n+'</span>':'')+'</td><td class="r num">'+x.score+'</td><td class="r num">'+x.max+'</td><td class="r num">'+p.toFixed(0)+'</td><td><div class="sb"><div class="bar" style="height:8px"><i style="width:'+p+'%"></i></div></div></td></tr>';});
+  const P=tt.total/tt.max*100;
+  h+='<tr style="font-weight:600"><td>Total</td><td class="r num">'+tt.total+'</td><td class="r num">'+tt.max+'</td><td class="r num">'+P.toFixed(0)+'</td><td><div class="sb"><div class="bar" style="height:8px"><i style="width:'+P+'%"></i></div></div></td></tr></tbody></table>';
+  if(tt.done<tt.n) h+='<div class="note">Passation incomplète : le total n’est pas interprétable en l’état.</div>';
+  h+='<div class="note info">'+(app.test==='mini'?'Le Mini-BESTest a été construit comme échelle unidimensionnelle : le total /28 est la mesure de référence ; les sous-scores (3 items chacun, 5 pour la marche) sont descriptifs. Repères de changement (troubles de l’équilibre d’origine neurologique mixte, Godi et al. 2013) : MDC95 = 3,5 pts ; MCID = 4 pts. Non établis pour une patientèle ostéopathique ambulatoire.':'Le BESTest est conçu pour profiler les systèmes (sections en %) ; comparer les sections entre elles plutôt que le total seul. Aucun seuil de changement n’est intégré ici.')+'</div>';
+  h+='<div class="pager" style="grid-template-columns:auto 1fr auto"><button class="btn" id="saveSess">Enregistrer la séance dans le suivi</button><span></span><span style="display:grid;grid-auto-flow:column;gap:8px"><button class="btn" id="copyRep">Copier le compte rendu</button><button class="btn" id="printRep">Imprimer</button><button class="btn" id="newSess">Nouvelle passation</button></span></div></div>';
+  // détail
+  h+='<div class="card" style="margin-top:16px"><table><thead><tr><th class="r" style="width:40px">#</th><th>Item</th><th>Détail</th><th class="r">Score</th></tr></thead><tbody>';
+  t.items.forEach(it=>{const r=itemScore(t,it,S());const det=it.units.map((u,k)=>(u.label?u.label.split(' — ')[0]+' ':'')+(r.units[k].final===null?'–':r.units[k].final)).join(' · ');
+    h+='<tr><td class="r num">'+it.n+'</td><td><a href="#" data-go="'+it.id+'" style="color:inherit">'+esc(it.title)+'</a></td><td class="small">'+(it.units.length>1?esc(det):'')+((S().mods[it.id]||{}).aide?' <span class="tag">aide tech.</span>':'')+((S().mods[it.id]||{}).assist?' <span class="tag bad">assistance</span>':'')+'</td><td class="r num">'+(r.score===null?'–':r.score)+'/'+itemMax(it)+'</td></tr>';});
+  h+='</tbody></table></div>'+copyright();
+  $('#main').innerHTML=h;
+}
+function report(){const {t,tt}=summaryData(app.test,S());
+  let s=t.name+' — '+(app.meta.pid||'')+' — '+(app.meta.date||'')+(app.meta.exam?' — '+app.meta.exam:'')+'\n';
+  s+='Total : '+tt.total+'/'+tt.max+' ('+(tt.total/tt.max*100).toFixed(0)+' %)'+(tt.done<tt.n?' [incomplet '+tt.done+'/'+tt.n+']':'')+'\n';
+  t.sections.forEach(x=>{const q=tt.sec[x.id];s+='  '+x.name+' : '+q.score+'/'+q.max+' ('+(q.score/q.max*100).toFixed(0)+' %)\n';});
+  const notes=t.items.filter(it=>(S().notes||{})[it.id]).map(it=>'  '+it.n+'. '+it.title+' : '+S().notes[it.id]);
+  if(notes.length) s+='Observations :\n'+notes.join('\n')+'\n';
+  return s;}
+
+/* ---------- matériel ---------- */
+function renderMat(){const t=T(); app.check[app.test]=app.check[app.test]||{};
+  let h='<h1 class="v">Préparation — '+t.name+'</h1><p class="sub">Durée indicative : '+(app.test==='mini'?'≈ 15 min':'≈ 30–35 min')+'. L’ordre « postes » regroupe les items par installation pour limiter les déplacements.</p><div class="grid2"><div class="card"><h3 style="margin-top:0">Matériel</h3><ul class="checklist">';
+  t.materiel.forEach((m,i)=>{h+='<li><input type="checkbox" data-chk="'+i+'" '+(app.check[app.test][i]?'checked':'')+'><span>'+esc(m)+'</span></li>';});
+  h+='</ul></div><div class="card"><h3 style="margin-top:0">Règles de cotation</h3><ul style="margin:0;padding-left:18px">'+t.rules.map(r=>'<li>'+esc(r)+'</li>').join('')+'</ul></div></div>';
+  h+='<div class="card" style="margin-top:16px"><h3 style="margin-top:0">Séquence par postes</h3><table><thead><tr><th>Poste</th><th>Items</th></tr></thead><tbody>'+t.stations.map(s=>{const its=t.items.filter(i=>i.st===s.id);return its.length?'<tr><td>'+esc(s.name)+'</td><td class="num">'+its.map(i=>i.n).join(', ')+'</td></tr>':'';}).join('')+'</tbody></table><div class="note info">Réordonner la passation s’écarte de la procédure standardisée ; l’ordre interne de l’item 19 (A → D) est conservé. Pour la recherche, préférer l’ordre officiel et le documenter.</div></div>'+copyright();
+  $('#main').innerHTML=h;}
+
+/* ---------- suivi ---------- */
+function snapshot(){const {t,tt}=summaryData(app.test,S());const items={};t.items.forEach(it=>{const r=itemScore(t,it,S());items[it.id]={score:r.score,units:Object.fromEntries(it.units.map((u,k)=>[u.key,r.units[k].final]))};});
+  return {uid:Date.now()+'-'+Math.random().toString(36).slice(2,7),test:app.test,pid:app.meta.pid,date:app.meta.date,exam:app.meta.exam,total:tt.total,max:tt.max,complete:tt.done===tt.n,
+    sections:Object.fromEntries(t.sections.map(s=>[s.id,tt.sec[s.id].score])),items,raw:JSON.parse(JSON.stringify(S()))};}
+function renderHist(){
+  const pid=app.meta.pid; const all=app.history.filter(h=>h.test===app.test);
+  const mine=pid?all.filter(h=>h.pid===pid):all; mine.sort((a,b)=>(a.pid||'').localeCompare(b.pid||'')||(a.date||'').localeCompare(b.date||''));
+  const t=T();
+  let h='<h1 class="v">Suivi — '+t.name+'</h1><p class="sub">'+(pid?'Séances du patient '+esc(pid):'Toutes les séances (renseigner un code patient pour filtrer)')+' · '+mine.length+' séance(s)'+(storageOK?'':' · <b style="color:var(--bad)">stockage local indisponible : exporter avant de fermer</b>')+'</p>';
+  h+='<div class="card"><table><thead><tr><th>Patient</th><th>Date</th>'+t.sections.map(s=>'<th class="r">'+esc(s.short)+'</th>').join('')+'<th class="r">Total</th><th class="r">Δ</th><th></th></tr></thead><tbody>';
+  let prev=null;
+  mine.forEach(x=>{let d='';if(prev&&prev.pid===x.pid){const dv=x.total-prev.total;let tag='';
+      if(app.test==='mini'){tag=Math.abs(dv)>=4?'<span class="tag '+(dv>0?'ok':'bad')+'">≥ MCID</span>':Math.abs(dv)>3.5?'<span class="tag">> MDC</span>':'';}
+      d='<span class="delta '+(dv>0?'up':dv<0?'down':'')+'">'+(dv>0?'+':'')+dv+'</span>'+tag;}
+    h+='<tr><td>'+esc(x.pid||'—')+'</td><td class="num">'+esc(x.date||'')+'</td>'+t.sections.map(s=>'<td class="r num">'+x.sections[s.id]+'</td>').join('')+'<td class="r num"><b>'+x.total+'</b>/'+x.max+(x.complete?'':'<span class="tag">incomplet</span>')+'</td><td class="r num">'+d+'</td><td class="r"><button class="btn sm" data-load="'+x.uid+'">Ouvrir</button> <button class="btn sm" data-del="'+x.uid+'">×</button></td></tr>';prev=x;});
+  if(!mine.length) h+='<tr><td colspan="'+(t.sections.length+5)+'" class="small">Aucune séance enregistrée. Utiliser « Enregistrer la séance » dans la synthèse.</td></tr>';
+  h+='</tbody></table>';
+  if(app.test==='mini') h+='<div class="note info">Δ comparé à la séance précédente du même patient. Repères : MDC95 3,5 ; MCID 4 points (Godi et al. 2013, population neurologique mixte) — à transposer avec prudence.</div>';
+  h+='</div><div class="card" style="margin-top:16px"><h3 style="margin-top:0">Export / import</h3><p class="small" style="margin-top:0">CSV : une ligne par séance (scores par unité de cotation + mesures brutes), prêt pour R/Python. JSON : sauvegarde complète, réimportable sur un autre appareil.</p>'+
+    '<div style="display:grid;grid-auto-flow:column;justify-content:start;gap:8px"><button class="btn" id="expCsv">Exporter CSV</button><button class="btn" id="expJson">Exporter JSON</button><label class="btn" style="display:inline-block">Importer JSON<input type="file" id="impJson" accept=".json,application/json" style="display:none"></label></div></div>'+copyright();
+  $('#main').innerHTML=h;}
+function csv(){const rows=[];const keys=new Set(['test','pid','date','exam','total','max','complete']);
+  app.history.forEach(x=>{const r={test:x.test,pid:x.pid,date:x.date,exam:x.exam,total:x.total,max:x.max,complete:x.complete};
+    Object.entries(x.sections).forEach(([k,v])=>{r['sec_'+k]=v;keys.add('sec_'+k);});
+    Object.entries(x.items).forEach(([id,o])=>{r[id]=o.score;keys.add(id);const uk=Object.keys(o.units);if(uk.length>1)uk.forEach(u=>{r[id+'_'+u]=o.units[u];keys.add(id+'_'+u);});});
+    Object.entries(x.raw.values||{}).forEach(([id,us])=>Object.entries(us).forEach(([u,vs])=>Object.entries(vs).forEach(([k,v])=>{if(k==='_touched')return;const c='raw_'+id+'_'+u+'_'+k;r[c]=typeof v==='boolean'?(v?1:0):v;keys.add(c);})));
+    Object.entries(x.raw.mods||{}).forEach(([id,m])=>{['aide','assist'].forEach(k=>{if(m[k]){const c='mod_'+id+'_'+k;r[c]=1;keys.add(c);}});});
+    rows.push(r);});
+  const K=[...keys];const q=v=>v==null?'':(/[;"\n]/.test(String(v))?'"'+String(v).replace(/"/g,'""')+'"':String(v));
+  return K.join(';')+'\n'+rows.map(r=>K.map(k=>q(r[k])).join(';')).join('\n');}
+function offer(filename,data){
+  try{const type=filename.endsWith('.csv')?'text/csv;charset=utf-8':'application/json';
+    const blob=new Blob([filename.endsWith('.csv')?'\ufeff'+data:data],{type});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);toast('Fichier enregistré');}
+  catch(e){modal(filename,data);}}
+function modal(title,text){const d=document.createElement('div');d.className='modal';d.innerHTML='<div class="box"><b>'+esc(title)+'</b><p class="small">Téléchargement impossible sur cet appareil : copier le contenu ci-dessous.</p><textarea readonly>'+esc(text)+'</textarea><div class="acts"><button class="btn" data-x>Fermer</button><button class="btn pri" data-c>Copier</button></div></div>';
+  document.body.appendChild(d);d.querySelector('[data-x]').onclick=()=>d.remove();d.querySelector('[data-c]').onclick=async()=>{try{await navigator.clipboard.writeText(text);toast('Copié');}catch(e){d.querySelector('textarea').select();toast('Sélectionné : Ctrl/Cmd+C');}};}
+
+/* ---------- dock ---------- */
+function renderDock(){const {t,tt}=summaryData(app.test,S());
+  let h='<div class="totbox"><span class="big num">'+tt.total+'<span style="color:var(--muted);font-size:16px">/'+tt.max+'</span></span><small>'+t.name+' · '+tt.done+'/'+tt.n+' items<br>'+(tt.total/tt.max*100).toFixed(0)+' %</small></div><div class="secbars">';
+  t.sections.forEach(s=>{const x=tt.sec[s.id];h+='<div class="sb"><div class="lab"><span>'+esc(s.short)+'</span><span class="num">'+x.score+'/'+x.max+'</span></div><div class="bar"><i style="width:'+(x.score/x.max*100)+'%"></i></div></div>';});
+  h+='</div><div class="act"><button class="btn sm" data-view="synthese">Synthèse</button></div>';
+  $('#dock').innerHTML=h;}
+
+/* ---------- rendu global ---------- */
+function render(){
+  document.querySelectorAll('#testSeg button').forEach(b=>b.classList.toggle('on',b.dataset.t===app.test));
+  $('#pid').value=app.meta.pid;$('#pdate').value=app.meta.date;$('#pexam').value=app.meta.exam;
+  const ex=document.querySelector('details.exam'); if(ex) app.examOpen=ex.open;
+  const ae=document.activeElement; const focusKey=ae&&(ae.dataset.num||ae.dataset.note); const sel=focusKey&&ae.selectionStart!=null?[ae.selectionStart,ae.selectionEnd]:null;
+  renderNav(); renderDock();
+  ({item:renderItem,synthese:renderSynth,materiel:renderMat,historique:renderHist})[app.view]();
+  if(focusKey){const el=document.querySelector('[data-num="'+focusKey+'"],[data-note="'+focusKey+'"]');if(el){el.focus();try{if(sel)el.setSelectionRange(sel[0],sel[1]);}catch(e){}}}
+}
+function go(id){app.view='item';app.cur[app.test]=id;save();render();window.scrollTo(0,0);}
+function step(d){const l=ordered();const i=l.findIndex(x=>x.id===app.cur[app.test]);const j=i+d;if(j>=l.length){app.view='synthese';save();render();window.scrollTo(0,0);return;}if(j>=0)go(l[j].id);}
+
+/* ---------- événements ---------- */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button,a,[data-view]'); if(!b) return;
+  if(b.dataset.t){app.test=b.dataset.t;save();render();return;}
+  if(b.dataset.o){app.order=b.dataset.o;save();render();return;}
+  if(b.dataset.view){app.view=b.dataset.view;save();render();window.scrollTo(0,0);return;}
+  if(b.dataset.go){e.preventDefault();go(b.dataset.go);return;}
+  if(b.dataset.step){step(+b.dataset.step);return;}
+  if(b.dataset.ov){const [id,u,s]=b.dataset.ov.split('|');setOv(id,u,+s);return;}
+  if(b.dataset.ch){const [id,u,k,c]=b.dataset.ch.split('|');toggleChrono(id,u,k,+c||0);return;}
+  if(b.id==='reroll'){app.dtN[app.test]=null;dtNumber();render();return;}
+  if(b.id==='saveSess'){if(!app.meta.pid){toast('Renseigner un code patient');$('#pid').focus();return;}app.history.push(snapshot());save();toast('Séance enregistrée');return;}
+  if(b.id==='printRep'){window.print();return;}
+  if(b.id==='copyRep'){const r=report();navigator.clipboard.writeText(r).then(()=>toast('Compte rendu copié')).catch(()=>modal('Compte rendu',r));return;}
+  if(b.id==='newSess'){const d=document.createElement('div');d.className='modal';d.innerHTML='<div class="box"><b>Nouvelle passation</b><p>Effacer la saisie en cours du '+T().name+' ? Les séances enregistrées dans le suivi sont conservées.</p><div class="acts"><button class="btn" data-x>Annuler</button><button class="btn pri" data-ok>Effacer</button></div></div>';document.body.appendChild(d);
+    d.querySelector('[data-x]').onclick=()=>d.remove();d.querySelector('[data-ok]').onclick=()=>{app.sess[app.test]=blank();app.dtN[app.test]=null;app.cur[app.test]=ordered()[0].id;app.view='item';save();d.remove();render();};return;}
+  if(b.dataset.load){const x=app.history.find(h=>h.uid===b.dataset.load);if(x){app.test=x.test;app.sess[x.test]=JSON.parse(JSON.stringify(x.raw));app.meta={pid:x.pid,date:x.date,exam:x.exam||''};app.view='synthese';save();render();toast('Séance chargée (copie de travail)');}return;}
+  if(b.dataset.del){app.history=app.history.filter(h=>h.uid!==b.dataset.del);save();render();return;}
+  if(b.id==='expCsv'){offer('bestest_suivi_'+today()+'.csv',csv());return;}
+  if(b.id==='expJson'){offer('bestest_sauvegarde_'+today()+'.json',JSON.stringify({version:1,history:app.history},null,1));return;}
+});
+document.addEventListener('change',e=>{const el=e.target;
+  if(el.dataset.flag){const [id,u,k]=el.dataset.flag.split('|');setVal(id,u,k,el.checked);}
+  else if(el.dataset.mod){const [id,k]=el.dataset.mod.split('|');setMod(id,k,el.checked);}
+  else if(el.dataset.chk!==undefined){app.check[app.test][el.dataset.chk]=el.checked;save();}
+  else if(el.id==='mobsel'){go(el.value);}
+  else if(el.id==='impJson'&&el.files[0]){const fr=new FileReader();fr.onload=()=>{try{const o=JSON.parse(fr.result);const have=new Set(app.history.map(h=>h.uid));let n=0;(o.history||[]).forEach(h=>{if(!have.has(h.uid)){app.history.push(h);n++;}});save();render();toast(n+' séance(s) importée(s)');}catch(err){toast('Fichier invalide');}};fr.readAsText(el.files[0]);}
+});
+document.addEventListener('input',e=>{const el=e.target;
+  if(el.dataset.num){const [id,u,k]=el.dataset.num.split('|');const v=el.value===''?null:+el.value;const s=S();s.values[id]=s.values[id]||{};s.values[id][u]=s.values[id][u]||{};s.values[id][u][k]=v;s.values[id][u]._touched=true;save();clearTimeout(el._t);el._t=setTimeout(render,350);}
+  else if(el.dataset.note){S().notes=S().notes||{};S().notes[el.dataset.note]=el.value;save();}
+  else if(el.id==='pid'||el.id==='pdate'||el.id==='pexam'){app.meta[{pid:'pid',pdate:'date',pexam:'exam'}[el.id]]=el.value;save();if(app.view!=='item'){clearTimeout(el._t);el._t=setTimeout(render,400);}}
+});
+document.addEventListener('keydown',e=>{
+  const tag=(e.target.tagName||'').toLowerCase(); if(tag==='input'||tag==='textarea'||tag==='select') return;
+  if(app.view!=='item') return;
+  if(e.key==='ArrowRight'){step(1);e.preventDefault();}
+  else if(e.key==='ArrowLeft'){step(-1);e.preventDefault();}
+  else if(/^[0-3]$/.test(e.key)){const it=T().items.find(i=>i.id===app.cur[app.test]);const r=itemScore(T(),it,S());
+    let k=r.units.findIndex(u=>u.raw===null); if(k<0) k=it.units.length===1?0:-1; if(k<0) return;
+    const u=it.units[k]; if(u.levels.some(l=>l.s===+e.key)) setOv(it.id,u.key,+e.key);}
+  else if(e.key===' '){const bt=document.querySelector('.chrono.run')||document.querySelector('.chrono');if(bt){bt.click();e.preventDefault();}}
+});
+render();
+})();
+</script>
+</body>
+</html>
