@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interpréter un Mini-BESTest chez l'adulte non âgé — guide de raisonnement</title>
+<style>
+:root{
+  --ink:#1d2327; --muted:#5f6b72; --line:#d9dddb; --soft:#f1f3f1;
+  --acc:#1f6f78; --acc-soft:#e3f0f1; --warn:#9a5a10; --warn-soft:#fbf1e2;
+  --ok:#2f7d4f; --ok-soft:#e5f2ea; --bad:#a3312b; --bad-soft:#f7e5e3;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{background:#f6f5f2}
+body{margin:0 auto;max-width:210mm;background:#fff;color:var(--ink);font-family:var(--sans);font-size:10.5pt;line-height:1.5;padding:16mm 16mm 14mm}
+h1{font-size:19pt;line-height:1.2;margin:0 0 2mm;font-weight:650;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0 0 5mm;font-size:10.5pt}
+.meta{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;column-gap:8mm;font-size:8.5pt;color:var(--muted);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:2mm 0;margin-bottom:6mm}
+.meta b{color:var(--ink);font-weight:600}
+h2{font-size:12.5pt;margin:7mm 0 2.5mm;font-weight:650;display:grid;grid-template-columns:8mm 1fr;align-items:baseline;break-after:avoid}
+h2 .n{color:var(--acc);font-family:var(--mono);font-size:11pt}
+h2+*{break-before:avoid}
+p{margin:0 0 2.5mm}
+.ind{margin-left:8mm}
+ul{margin:0 0 2.5mm;padding-left:5mm}
+li{margin:0 0 1mm}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.box{border-left:3px solid var(--warn);background:var(--warn-soft);padding:3mm 4mm;border-radius:0 4px 4px 0;margin:0 0 4mm;font-size:9.8pt}
+.box b{color:var(--warn)}
+.key{border-left:3px solid var(--acc);background:var(--acc-soft);padding:3mm 4mm;border-radius:0 4px 4px 0;margin:5mm 0 4mm 8mm;font-size:10pt;break-inside:avoid}
+table{border-collapse:collapse;width:100%;font-size:9.5pt;margin:1mm 0 2mm}
+th,td{padding:1.6mm 2.4mm;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{font-size:7.8pt;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1.5px solid var(--ink)}
+td.r,th.r{text-align:right}
+td.c,th.c{text-align:center}
+table.grid{width:auto}
+table.grid th,table.grid td{padding:1.1mm 3mm}
+table.grid th:first-child,table.grid td:first-child{padding-left:0;min-width:22mm}
+td.num,td.r{white-space:nowrap}
+.src{font-size:8pt;color:var(--muted)}
+.cap{font-size:8.5pt;color:var(--muted);margin:0 0 3mm}
+.tbl{margin-left:8mm}
+.tbl table{break-inside:avoid}
+.tbl .cap{break-before:avoid}
+.zone{display:inline-block;min-width:17mm;text-align:center;border-radius:3px;padding:.3mm 0;font-weight:600;font-size:8.8pt}
+.z-ok{background:var(--ok-soft);color:var(--ok)}
+.z-grey{background:var(--soft);color:var(--muted)}
+.z-bad{background:var(--bad-soft);color:var(--bad)}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0 0 0 8mm}
+.steps li{display:grid;grid-template-columns:7mm 1fr;column-gap:2mm;margin:0 0 2.2mm;break-inside:avoid}
+.steps li::before{counter-increment:s;content:counter(s);font-family:var(--mono);color:#fff;background:var(--acc);border-radius:50%;width:5.5mm;height:5.5mm;line-height:5.5mm;text-align:center;font-size:8.5pt;margin-top:.4mm}
+.steps b{font-weight:650}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:5mm;margin-left:8mm;break-inside:avoid}
+.card{border:1px solid var(--line);border-radius:4px;padding:3mm 3.5mm}
+.card h3{margin:0 0 1.5mm;font-size:9pt;letter-spacing:.04em;text-transform:uppercase}
+.card.ok h3{color:var(--ok)} .card.bad h3{color:var(--bad)}
+.card ul{margin:0}
+ol.refs{font-size:8.6pt;color:#3c464c;padding-left:6mm;margin:0 0 0 8mm}
+ol.refs li{margin:0 0 1.2mm}
+footer{margin-top:6mm;padding-top:2mm;border-top:1px solid var(--line);font-size:8pt;color:var(--muted);display:grid;grid-template-columns:1fr auto}
+sup{font-size:7pt;color:var(--acc);font-family:var(--mono)}
+@page{size:A4;margin:12mm 0 12mm 0}
+@media print{
+  html{background:#fff}
+  body{padding:0 16mm;max-width:none}
+  .noprint{display:none}
+}
+@media (max-width:700px){
+  body{padding:6mm 5mm;font-size:11pt}
+  .ind,.tbl,.two,.steps,ol.refs,.key{margin-left:0}
+  .two{grid-template-columns:1fr}
+  .meta{grid-template-columns:1fr}
+  .tbl{overflow-x:auto}
+}
+</style>
+</head>
+<body>
+<p class="noprint" style="margin:0 0 4mm;font-size:9pt"><a href="index.html" style="color:var(--acc);text-decoration:none">← Outil de passation</a></p>
+
+<h1>Interpréter un Mini-BESTest chez l'adulte non âgé</h1>
+<p class="lede">Guide de raisonnement clinique provisoire, à utiliser en attendant des données de validation propres à cette population.</p>
+<div class="meta"><span>Version <b>1.2</b> · 07/11/2026</span><span>Auteur <b>Th. Marin, PhD, DO</b> — ESO Paris</span><span>Statut <b>raisonnement par défaut, non validé</b></span></div>
+
+<div class="box"><b>À lire avant usage.</b> Aucun seuil « normal / déficitaire » n'est validé pour le Mini-BESTest (MBT) chez l'adulte de moins de 50 ans. Les repères ci-dessous combinent des normes étrangères, de petits échantillons et l'erreur de mesure publiée. Ils servent à structurer un jugement clinique, pas à le remplacer, et ne doivent pas être présentés comme un critère diagnostique.</div>
+
+<h2><span class="n">1</span>Grille de lecture du score total</h2>
+<p class="ind">Principe : on compare le score à la <b>valeur attendue pour l'âge</b>. Un sujet sain dont la vraie valeur est 27 peut obtenir n'importe quel score entre ≈ 24,3 et 28 en une passation (27 ± 1,96 × 1,4, plafonné à 28). On ne parle donc de déficit probable qu'à <b>≈ 3 points sous la norme d'âge</b>.</p>
+<div class="tbl">
+<table class="grid">
+<thead><tr><th>Âge</th><th class="r">Attendu</th><th class="c">Déficit probable</th><th class="c">Zone grise</th><th class="c">RàS</th></tr></thead>
+<tbody>
+<tr><td>&lt; 50 ans</td><td class="r num">≈ 27</td><td class="c"><span class="zone z-bad num">≤ 23</span></td><td class="c"><span class="zone z-grey num">24–25</span></td><td class="c"><span class="zone z-ok num">≥ 26</span></td></tr>
+<tr><td>50–59 ans</td><td class="r num">26,3</td><td class="c"><span class="zone z-bad num">≤ 23</span></td><td class="c"><span class="zone z-grey num">24</span></td><td class="c"><span class="zone z-ok num">≥ 25</span></td></tr>
+<tr><td>60–69 ans</td><td class="r num">24,7</td><td class="c"><span class="zone z-bad num">≤ 21</span></td><td class="c"><span class="zone z-grey num">22–23</span></td><td class="c"><span class="zone z-ok num">≥ 24</span></td></tr>
+<tr><td>70–79 ans</td><td class="r num">21,0</td><td class="c"><span class="zone z-bad num">≤ 18</span></td><td class="c"><span class="zone z-grey num">19</span></td><td class="c"><span class="zone z-ok num">≥ 20</span></td></tr>
+<tr><td>80–89 ans</td><td class="r num">19,6</td><td class="c"><span class="zone z-bad num">≤ 16</span></td><td class="c"><span class="zone z-grey num">17–18</span></td><td class="c"><span class="zone z-ok num">≥ 19</span></td></tr>
+</tbody>
+</table>
+<p class="cap">Règles : RàS (rien à signaler) = score ≥ norme − 1 SEM (≈ 1,4 pt) ; « déficit probable » = score ≤ norme − ≈ 3 points (≈ 2 SEM) ; entre les deux, zone grise. Bornes arrondies à l'entier. Avant 50 ans, on suppose un plateau à ≈ 27 (effet plafond) plutôt qu'une pente linéaire : le déclin observé est non linéaire, avec la baisse la plus marquée entre 60–69 et 70–79 ans (−3,7 points).</p>
+</div>
+
+<div class="key"><b>Formulation par défaut défendable.</b> Chez un adulte de moins de 50 ans présentant un tableau clinique évocateur, un MBT ≤ 23, ou un échec sur un item facile (1, 7 ou 9), oriente vers un déficit d'équilibre dynamique. Un score ≥ 26 ne l'exclut pas : chez l'adulte jeune, l'effet plafond rend le test peu sensible. Pour un profil par système, compléter par le BESTest.</div>
+
+<p class="cap" style="margin:6mm 0 0 8mm;font-style:italic">Les sections suivantes justifient la grille et alimentent la réflexion selon les besoins.</p>
+<h2><span class="n">2</span>Lire où les points sont perdus</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>Item</th><th class="r">% cotant 2<br>(douleur chronique)</th><th>Signification d'un échec chez un adulte jeune</th></tr></thead>
+<tbody>
+<tr><td>7 — Pieds joints, yeux ouverts, sol ferme</td><td class="r num">91,7</td><td><b>Signal fort</b> : item presque toujours réussi</td></tr>
+<tr><td>1 — Assis à debout</td><td class="r num">83,9</td><td><b>Signal fort</b></td></tr>
+<tr><td>9 — Plan incliné, yeux fermés</td><td class="r num">78,3</td><td><b>Signal fort</b></td></tr>
+<tr><td>3 — Unipodal</td><td class="r num">46,1</td><td>Signal faible</td></tr>
+<tr><td>6 — Pas compensatoire latéral</td><td class="r num">36,1</td><td>Signal faible ; item le plus souvent refusé (11,1 %)</td></tr>
+<tr><td>14 — TUG en double tâche</td><td class="r num">9,4</td><td>Signal faible : item le plus difficile, y compris chez des seniors entraînés<sup>10</sup></td></tr>
+</tbody>
+</table>
+<p class="cap">Pourcentages tirés de Wagner 2023<sup>2</sup> (n = 180). Un <b>refus</b> d'item (13,9 % des patients y ont refusé au moins un item) est une information clinique en soi (évitement, appréhension) : le noter plutôt que le coter 0 sans commentaire.</p>
+</div>
+
+<h2><span class="n">3</span>Ce que mesure le MBT</h2>
+<ul class="ind">
+<li>Un construit unique : l'<b>équilibre dynamique</b>. Le MBT a été construit comme échelle unidimensionnelle<sup>1</sup>, et ce modèle à un facteur se retrouve chez des patients douloureux chroniques<sup>2</sup>.</li>
+<li><b>Le total /28 est la mesure de référence.</b> Les sous-scores (3 items chacun, 5 pour la marche) sont descriptifs ; chez le douloureux chronique, les auteurs recommandent explicitement le total plutôt que les sous-scores<sup>2</sup>.</li>
+<li>Pour un <b>profil par système</b> (contraintes biomécaniques, limites de stabilité, anticipation, réactions, orientation sensorielle, marche), utiliser le <b>BESTest</b> complet<sup>3</sup>.</li>
+</ul>
+
+<h2><span class="n">4</span>Repères chiffrés disponibles</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>Population</th><th class="r">Âge</th><th class="r">n</th><th class="r">Score MBT</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Adultes sains (Iran)</td><td class="r num">18–29</td><td class="r num">≈ 50</td><td class="r num">≈ 27</td><td class="src">Normes iraniennes<sup>4</sup></td></tr>
+<tr><td>Adultes sains, témoins</td><td class="r num">≈ 35</td><td class="r num">45</td><td class="r num">méd. 27 [23–28]</td><td class="src">Étude TCL subaigu<sup>5</sup></td></tr>
+<tr><td>Traumatisme crânien léger subaigu</td><td class="r num">≈ 36</td><td class="r num">90</td><td class="r num">méd. 24 [18–28]</td><td class="src">Étude TCL subaigu<sup>5</sup></td></tr>
+<tr><td>Douleur chronique (centre spécialisé)</td><td class="r num">≈ 52</td><td class="r num">180</td><td class="r num">méd. 21 (EIQ 16–25)</td><td class="src">Wagner 2023<sup>2</sup></td></tr>
+<tr><td>Adultes sains (Canada)</td><td class="r num">50–59</td><td class="r num">—</td><td class="r num">26,3</td><td class="src">O'Hoski<sup>6</sup></td></tr>
+<tr><td></td><td class="r num">60–69</td><td class="r num">—</td><td class="r num">24,7</td><td class="src"></td></tr>
+<tr><td></td><td class="r num">70–79</td><td class="r num">—</td><td class="r num">21,0</td><td class="src"></td></tr>
+<tr><td></td><td class="r num">80–89</td><td class="r num">—</td><td class="r num">19,6</td><td class="src"></td></tr>
+</tbody>
+</table>
+<p class="cap">Valeurs [min–max] entre crochets ; EIQ = écart interquartile. Effectifs canadiens : 79 au total, soit environ 20 par décennie. L'effectif iranien par tranche d'âge est estimé (300 sujets répartis en 6 tranches).</p>
+
+<table>
+<thead><tr><th>Erreur de mesure et changement</th><th class="r">Valeur</th><th>Population</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Erreur standard de mesure (SEM)</td><td class="r num">≈ 1,4 pt</td><td>Seniors à domicile ; enfants (1,42)</td><td class="src">Marques 2016<sup>7</sup> ; Southard<sup>8</sup></td></tr>
+<tr><td>Changement minimal détectable (MDC95)</td><td class="r num">3,5 pts</td><td>Troubles de l'équilibre, neuro mixte</td><td class="src">Godi 2013<sup>9</sup></td></tr>
+<tr><td>Différence cliniquement importante (MCID)</td><td class="r num">4 pts</td><td>Troubles de l'équilibre, neuro mixte</td><td class="src">Godi 2013<sup>9</sup></td></tr>
+</tbody>
+</table>
+</div>
+
+<h2><span class="n">5</span>Limites</h2>
+<ul class="ind" style="break-inside:avoid">
+<li>Normes issues de populations étrangères (Iran, Canada), de versions linguistiques différentes et de petits effectifs par tranche d'âge.</li>
+<li>Comparaisons indirectes entre études (médianes contre moyennes, protocoles différents).</li>
+<li>MDC et MCID établis en population neurologique ; leur transposition à une patientèle ostéopathique ambulatoire n'est pas démontrée.</li>
+<li>Les patients de centre de la douleur<sup>2</sup> sont plus sévères que la patientèle habituelle d'un cabinet : s'attendre à des scores plus hauts et à un effet plafond plus marqué.</li>
+<li>Biais d'examinateur : la connaissance du tableau clinique influence la cotation des items laissés à l'appréciation (4–6, 10–13). Coter les items chronométrés avant d'interpréter, ou faire passer le test par un tiers.</li>
+<li>À recalibrer sur des données propres (distribution des scores au cabinet confrontée à un critère externe).</li>
+</ul>
+
+<h2><span class="n">6</span>Références</h2>
+<ol class="refs">
+<li>Franchignoni F, Horak F, Godi M, Nardone A, Giordano A. Using psychometric techniques to improve the Balance Evaluation Systems Test: the mini-BESTest. <i>J Rehabil Med</i> 2010;42:323–331.</li>
+<li>Wagner S, Bring A, Åsenlöf P. Construct validity of the Mini-BESTest in individuals with chronic pain in specialized pain care. <i>BMC Musculoskelet Disord</i> 2023;24:391. doi:10.1186/s12891-023-06504-9</li>
+<li>Horak FB, Wrisley DM, Frank J. The Balance Evaluation Systems Test (BESTest) to differentiate balance deficits. <i>Phys Ther</i> 2009;89:484–498.</li>
+<li>Balance measures of mini and brief balance evaluation system tests for Iranian population. <i>J Prev Med Hyg</i> (2024). PubMed 38706770.</li>
+<li>Assessment of balance in people with mild traumatic brain injury using a balance systems model approach. Oregon Health &amp; Science University, Balance Disorders Laboratory.</li>
+<li>O'Hoski S, Winship B, Herridge L, et al. Increasing the clinical utility of the BESTest, Mini-BESTest, and Brief-BESTest: normative values in Canadian adults who are healthy and aged 50 years or older. <i>Phys Ther</i> 2014;94(3):334–342.</li>
+<li>Marques A, et al. (2016), cité dans : Sunnaas Rehabilitation Hospital, fiche de synthèse Mini-BESTest (SEM 1,4 ; MDC95 3,8 chez les seniors à domicile).</li>
+<li>Southard V, et al. Development of normative data using the Mini-BESTest on children ages 7–17.</li>
+<li>Godi M, Franchignoni F, Caligari M, et al. Comparison of reliability, validity, and responsiveness of the Mini-BESTest and Berg Balance Scale in patients with balance disorders. <i>Phys Ther</i> 2013;93:158–167.</li>
+<li>Ban B, Sevšek F, Rugelj D. A comparison of the ceiling effect between Berg Balance Scale and Mini-BESTest in a group of balance trained community-dwelling older adults. <i>Physiother Q</i> 2018.</li>
+</ol>
+
+<footer><span>Mini-BESTest © 2005–2013 Oregon Health &amp; Science University. Guide indépendant, non affilié à l'OHSU.</span><span class="num">v1.2 · 07/11/2026</span></footer>
+</body>
+</html>

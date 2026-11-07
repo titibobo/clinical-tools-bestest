@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interpréter un BESTest chez l'adulte non âgé — guide de raisonnement</title>
+<style>
+:root{
+  --ink:#1d2327; --muted:#5f6b72; --line:#d9dddb; --soft:#f1f3f1;
+  --acc:#1f6f78; --acc-soft:#e3f0f1; --warn:#9a5a10; --warn-soft:#fbf1e2;
+  --ok:#2f7d4f; --ok-soft:#e5f2ea; --bad:#a3312b; --bad-soft:#f7e5e3;
+  --sans:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box}
+html{background:#f6f5f2}
+body{margin:0 auto;max-width:210mm;background:#fff;color:var(--ink);font-family:var(--sans);font-size:10.5pt;line-height:1.5;padding:16mm 16mm 14mm}
+h1{font-size:19pt;line-height:1.2;margin:0 0 2mm;font-weight:650;letter-spacing:-.01em}
+.lede{color:var(--muted);margin:0 0 5mm;font-size:10.5pt}
+.meta{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;column-gap:8mm;font-size:8.5pt;color:var(--muted);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:2mm 0;margin-bottom:6mm}
+.meta b{color:var(--ink);font-weight:600}
+h2{font-size:12.5pt;margin:7mm 0 2.5mm;font-weight:650;display:grid;grid-template-columns:8mm 1fr;align-items:baseline;break-after:avoid}
+h2 .n{color:var(--acc);font-family:var(--mono);font-size:11pt}
+h2+*{break-before:avoid}
+p{margin:0 0 2.5mm}
+.ind{margin-left:8mm}
+ul{margin:0 0 2.5mm;padding-left:5mm}
+li{margin:0 0 1mm}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.box{border-left:3px solid var(--warn);background:var(--warn-soft);padding:3mm 4mm;border-radius:0 4px 4px 0;margin:0 0 4mm;font-size:9.8pt}
+.box b{color:var(--warn)}
+.key{border-left:3px solid var(--acc);background:var(--acc-soft);padding:3mm 4mm;border-radius:0 4px 4px 0;margin:5mm 0 4mm 8mm;font-size:10pt;break-inside:avoid}
+table{border-collapse:collapse;width:100%;font-size:9.5pt;margin:1mm 0 2mm}
+th,td{padding:1.6mm 2.4mm;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{font-size:7.8pt;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);font-weight:600;border-bottom:1.5px solid var(--ink)}
+td.r,th.r{text-align:right}
+td.c,th.c{text-align:center}
+table.grid{width:auto}
+table.grid th,table.grid td{padding:1.1mm 3mm}
+table.grid th:first-child,table.grid td:first-child{padding-left:0;min-width:22mm}
+td.num,td.r{white-space:nowrap}
+.src{font-size:8pt;color:var(--muted)}
+.cap{font-size:8.5pt;color:var(--muted);margin:0 0 3mm}
+.tbl{margin-left:8mm}
+.tbl table{break-inside:avoid}
+.tbl .cap{break-before:avoid}
+.zone{display:inline-block;min-width:17mm;text-align:center;border-radius:3px;padding:.3mm 0;font-weight:600;font-size:8.8pt}
+.z-ok{background:var(--ok-soft);color:var(--ok)}
+.z-grey{background:var(--soft);color:var(--muted)}
+.z-bad{background:var(--bad-soft);color:var(--bad)}
+.steps{counter-reset:s;list-style:none;padding:0;margin:0 0 0 8mm}
+.steps li{display:grid;grid-template-columns:7mm 1fr;column-gap:2mm;margin:0 0 2.2mm;break-inside:avoid}
+.steps li::before{counter-increment:s;content:counter(s);font-family:var(--mono);color:#fff;background:var(--acc);border-radius:50%;width:5.5mm;height:5.5mm;line-height:5.5mm;text-align:center;font-size:8.5pt;margin-top:.4mm}
+.steps b{font-weight:650}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:5mm;margin-left:8mm;break-inside:avoid}
+.card{border:1px solid var(--line);border-radius:4px;padding:3mm 3.5mm}
+.card h3{margin:0 0 1.5mm;font-size:9pt;letter-spacing:.04em;text-transform:uppercase}
+.card.ok h3{color:var(--ok)} .card.bad h3{color:var(--bad)}
+.card ul{margin:0}
+ol.refs{font-size:8.6pt;color:#3c464c;padding-left:6mm;margin:0 0 0 8mm}
+ol.refs li{margin:0 0 1.2mm}
+footer{margin-top:6mm;padding-top:2mm;border-top:1px solid var(--line);font-size:8pt;color:var(--muted);display:grid;grid-template-columns:1fr auto}
+sup{font-size:7pt;color:var(--acc);font-family:var(--mono)}
+@page{size:A4;margin:12mm 0 12mm 0}
+@media print{
+  html{background:#fff}
+  body{padding:0 16mm;max-width:none}
+  .noprint{display:none}
+}
+@media (max-width:700px){
+  body{padding:6mm 5mm;font-size:11pt}
+  .ind,.tbl,.two,.steps,ol.refs,.key{margin-left:0}
+  .two{grid-template-columns:1fr}
+  .meta{grid-template-columns:1fr}
+  .tbl{overflow-x:auto}
+}
+.sec{font-family:var(--mono);color:var(--acc);font-weight:600}
+table.grid2 th,table.grid2 td{padding:1.1mm 2mm}
+table.grid2 th:first-child,table.grid2 td:first-child{padding-left:0}
+.pair{display:grid;grid-template-columns:auto auto;gap:1.5mm;justify-content:center}
+.zone.s{min-width:13mm}
+table.mgmt td{font-size:8.8pt}
+table.mgmt tr{break-inside:avoid}
+.tbl table.mgmt{break-inside:auto}
+table.grid2 td:first-child{white-space:nowrap}
+table.mgmt td:first-child{width:34mm}
+table.mgmt td:first-child{white-space:normal}
+table.mgmt td:first-child b{display:block}
+.pill{display:inline-block;font-size:7.5pt;font-family:var(--mono);color:var(--muted)}
+.sub3{font-size:10pt;margin:3mm 0 1.5mm 8mm;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;break-after:avoid}
+</style>
+</head>
+<body>
+<p class="noprint" style="margin:0 0 4mm;font-size:9pt"><a href="index.html" style="color:var(--acc);text-decoration:none">← Outil de passation</a></p>
+<h1>Interpréter un BESTest chez l'adulte non âgé</h1>
+<p class="lede">Guide de raisonnement clinique provisoire : du score par section à l'orientation de la prise en charge.</p>
+<div class="meta"><span>Version <b>1.1</b> · 07/11/2026</span><span>Auteur <b>Th. Marin, PhD, DO</b> — ESO Paris</span><span>Statut <b>raisonnement par défaut, non validé</b></span></div>
+
+<div class="box"><b>À lire avant usage.</b> Aucun seuil « normal / déficitaire » n'est validé pour le BESTest chez l'adulte de moins de 50 ans. Les repères ci-dessous combinent quelques études normatives, de petits échantillons et l'erreur de mesure publiée. Ils servent à structurer un jugement clinique, pas à le remplacer.</div>
+
+<h2><span class="n">1</span>Grilles de lecture</h2>
+<h3 class="sub3">Score total</h3>
+
+<div class="tbl">
+<table class="grid">
+<thead><tr><th>Âge</th><th class="r">Attendu /108</th><th class="c">Déficit probable</th><th class="c">Zone grise</th><th class="c">RàS</th></tr></thead>
+<tbody>
+<tr><td>&lt; 50 ans</td><td class="r num">107,7 <span class="pill">(99,7 %)</span></td><td class="c"><span class="zone z-bad num">≤ 101</span></td><td class="c"><span class="zone z-grey num">102–104</span></td><td class="c"><span class="zone z-ok num">≥ 105</span></td></tr>
+<tr><td>50–59 ans</td><td class="r num">103,4 <span class="pill">(95,7 %)</span></td><td class="c"><span class="zone z-bad num">≤ 97</span></td><td class="c"><span class="zone z-grey num">98–100</span></td><td class="c"><span class="zone z-ok num">≥ 101</span></td></tr>
+<tr><td>60–69 ans</td><td class="r num">98,7 <span class="pill">(91,4 %)</span></td><td class="c"><span class="zone z-bad num">≤ 92</span></td><td class="c"><span class="zone z-grey num">93–95</span></td><td class="c"><span class="zone z-ok num">≥ 96</span></td></tr>
+<tr><td>70–79 ans</td><td class="r num">92,2 <span class="pill">(85,4 %)</span></td><td class="c"><span class="zone z-bad num">≤ 86</span></td><td class="c"><span class="zone z-grey num">87–89</span></td><td class="c"><span class="zone z-ok num">≥ 90</span></td></tr>
+<tr><td>80–89 ans</td><td class="r num">85,8 <span class="pill">(79,4 %)</span></td><td class="c"><span class="zone z-bad num">≤ 79</span></td><td class="c"><span class="zone z-grey num">80–82</span></td><td class="c"><span class="zone z-ok num">≥ 83</span></td></tr>
+</tbody></table>
+<p class="cap">RàS = score ≥ attendu − 1 SEM (≈ 3 pts) ; déficit probable = score ≤ attendu − 2 SEM (≈ 6 pts) ; bornes arrondies à l'entier. SEM estimée à partir du MDC95 de 8,2 pts mesuré chez des seniors à domicile<sup>4</sup>.</p>
+</div>
+
+<h3 class="sub3">Par section</h3>
+
+<p class="ind">Principe : on compare chaque section à sa valeur attendue pour l'âge. Avant 50 ans, l'attendu est le maximum (ou presque) : perdre 3 points dans une section n'arrive pas chez l'adulte jeune sain.</p>
+<div class="tbl">
+<table class="grid2">
+<thead><tr><th>Section</th><th class="r">Max</th><th class="r">1 pt =</th><th class="c">&lt; 50 ans</th><th class="c">50–59 ans</th><th class="c">60–69 ans</th></tr></thead>
+<tbody>
+<tr><td><span class="sec">I</span> Biomécanique</td><td class="r num">15</td><td class="r num">6,7 %</td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 11</span><span class="zone s z-ok num">≥ 14</span></span></td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 11</span><span class="zone s z-ok num">≥ 14</span></span></td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 10</span><span class="zone s z-ok num">≥ 13</span></span></td></tr>
+<tr><td><span class="sec">II</span> Limites de stabilité</td><td class="r num">21</td><td class="r num">4,8 %</td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 18</span><span class="zone s z-ok num">≥ 20</span></span></td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 16</span><span class="zone s z-ok num">≥ 19</span></span></td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 16</span><span class="zone s z-ok num">≥ 19</span></span></td></tr>
+<tr><td><span class="sec">III</span> Anticipation (APA)</td><td class="r num">18</td><td class="r num">5,6 %</td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 15</span><span class="zone s z-ok num">≥ 17</span></span></td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 14</span><span class="zone s z-ok num">≥ 17</span></span></td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 13</span><span class="zone s z-ok num">≥ 16</span></span></td></tr>
+<tr><td><span class="sec">IV</span> Réactions</td><td class="r num">18</td><td class="r num">5,6 %</td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 15</span><span class="zone s z-ok num">≥ 17</span></span></td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 14</span><span class="zone s z-ok num">≥ 17</span></span></td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 12</span><span class="zone s z-ok num">≥ 15</span></span></td></tr>
+<tr><td><span class="sec">V</span> Orientation sensorielle</td><td class="r num">15</td><td class="r num">6,7 %</td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 12</span><span class="zone s z-ok num">≥ 14</span></span></td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 11</span><span class="zone s z-ok num">≥ 14</span></span></td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 11</span><span class="zone s z-ok num">≥ 14</span></span></td></tr>
+<tr><td><span class="sec">VI</span> Marche</td><td class="r num">21</td><td class="r num">4,8 %</td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 17</span><span class="zone s z-ok num">≥ 20</span></span></td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 16</span><span class="zone s z-ok num">≥ 19</span></span></td><td class="c"><span class="pair"><span class="zone s z-bad num">≤ 15</span><span class="zone s z-ok num">≥ 18</span></span></td></tr>
+</tbody></table>
+<p class="cap">Dans chaque case : <span class="zone s z-bad num">≤ x</span> déficit probable (≈ 3 pts sous l'attendu), <span class="zone s z-ok num">≥ y</span> RàS (au plus ≈ 1 pt sous l'attendu) ; entre les deux, zone grise. Base : SEM d'une section ≈ 1 pt (MDC95 de 2,1 à 3,4 pts selon la section chez des seniors<sup>4</sup>). Non calculé au-delà de 70 ans : la dispersion des sujets sains (écart-types de 8 à 18 % selon la section) y dépasse l'erreur de mesure, et le seuil signalerait une part importante de sujets sans trouble.</p>
+</div>
+
+<div class="key"><b>Formulation par défaut défendable.</b> Chez un adulte de moins de 50 ans, une perte de 3 points ou plus dans une section est inhabituelle et oriente la prise en charge vers le système correspondant, à condition qu'elle ne repose pas sur un seul item difficile (item 27). Le profil oriente, il ne diagnostique pas : recontrôler la section ciblée après prise en charge, un changement n'étant réel qu'au-delà de 2 à 3 points.</div>
+
+<p class="cap" style="margin:6mm 0 0 8mm;font-style:italic">Les sections suivantes orientent la prise en charge, puis justifient les grilles et alimentent la réflexion selon les besoins.</p>
+<h2><span class="n">2</span>Du profil à la prise en charge</h2>
+<div class="tbl">
+<table class="mgmt">
+<thead><tr><th>Section</th><th>Un échec suggère</th><th>À explorer</th><th>Orientation de prise en charge</th></tr></thead>
+<tbody>
+<tr><td><span class="sec">I</span><b>Contraintes biomécaniques</b><span class="pill">items 1–5</span></td><td>Contrainte périphérique : douleur ou déformation du pied, amplitude ou force de cheville, force des abducteurs de hanche, transfert sol-debout.</td><td>Examen articulaire et musculaire ciblé (cheville, pied, hanche), douleur à l'appui.</td><td>Traiter la contrainte locale (mobilité de cheville, renforcement des abducteurs, chaussage), puis recontrôler la section : c'est la section la plus accessible à la prise en charge manuelle.</td></tr>
+<tr><td><span class="sec">II</span><b>Limites de stabilité</b><span class="pill">items 6–8</span></td><td>Limites de stabilité réduites ou mauvaise perception de la verticale : inclinaison assise yeux fermés, portée antérieure et latérale.</td><td>Peur de tomber (questionnaire de confiance en l'équilibre), raideur du tronc et des hanches, réalignement avec overshoot ou undershoot.</td><td>Transferts de poids progressifs vers les limites, avec retour d'information ; travail de la confiance si la peur domine.</td></tr>
+<tr><td><span class="sec">III</span><b>Ajustements anticipatoires</b><span class="pill">items 9–13</span></td><td>Anticipation insuffisante dans les tâches volontaires : assis-debout, pointe des pieds, unipodal, pas sur marche, pointage avec charge.</td><td>Force des membres inférieurs, douleur à l'appui unipodal, stratégie de compensation (bras, tronc).</td><td>Entraîner les tâches échouées elles-mêmes, en progressant en vitesse et en amplitude (transfert limité d'une tâche à l'autre).</td></tr>
+<tr><td><span class="sec">IV</span><b>Réactions posturales</b><span class="pill">items 14–18</span></td><td>Réactions automatiques inefficaces ou retardées : stratégie de cheville ou de hanche sur place, pas compensatoires avant, arrière et latéraux.</td><td>Appréhension aux poussées, différence entre directions (latéral souvent le plus faible), force rapide.</td><td>Entraînement par perturbations progressives (poussées, lâchers), pas compensatoires dans la direction déficitaire.</td></tr>
+<tr><td><span class="sec">V</span><b>Orientation sensorielle</b><span class="pill">items 19–20</span></td><td>Repondération sensorielle : yeux fermés sur sol dur (B), mousse yeux ouverts (C) ou fermés (D), rampe yeux fermés.</td><td>Quelle condition échoue : un échec isolé en D (mousse yeux fermés), surtout avec vertiges, oriente vers une évaluation vestibulaire. Section à 99 % même chez des sujets de 65 ans<sup>3</sup> : tout échec est notable.</td><td>Varier surfaces et entrées visuelles à l'entraînement ; orientation médicale ou ORL si signes vestibulaires.</td></tr>
+<tr><td><span class="sec">VI</span><b>Stabilité à la marche</b><span class="pill">items 21–27</span></td><td>Adaptation de la marche : vitesse, rotations de tête, demi-tour, obstacles, TUG, TUG en double tâche.</td><td>Isoler l'item 27 (double tâche), difficile pour tous les groupes<sup>2,3</sup> : une perte limitée à cet item est un signal faible. Rotations de tête : piste cervicale ou vestibulaire.</td><td>Marche avec les tâches échouées (rotations de tête, demi-tours, obstacles), double tâche progressive.</td></tr>
+</tbody></table>
+<p class="cap">Lecture fondée sur le modèle par systèmes du BESTest<sup>1</sup> : des déficits différents appellent des traitements différents. Ce raisonnement est cohérent mais, à notre connaissance, l'efficacité d'une prise en charge guidée par le profil de sections n'a pas été démontrée par des essais.</p>
+</div>
+
+<h2><span class="n">3</span>Ce que mesure le BESTest</h2>
+<ul class="ind">
+<li>27 items (36 unités de cotation, 0 à 3), total /108 exprimé en %, répartis en <b>6 sections</b> correspondant chacune à un système du contrôle postural<sup>1</sup>.</li>
+<li>Contrairement au Mini-BESTest, il est <b>conçu pour le profil</b> : identifier quel système est en défaut pour orienter le traitement<sup>1</sup>.</li>
+<li>Contrepartie : les sections sont <b>moins fiables que le total</b> (fiabilité test-retest des sections de 0,72 à 0,89 chez des seniors<sup>4</sup>, de 0,66 à 0,93 dans la sclérose en plaques<sup>5</sup>) et plusieurs présentent un effet plafond<sup>5</sup>. Le profil se lit comme une hypothèse de travail.</li>
+</ul>
+
+<h2><span class="n">4</span>Repères chiffrés disponibles</h2>
+<div class="tbl">
+<table>
+<thead><tr><th>Section</th><th class="r">Max</th><th class="r">20–40 ans<sup>3</sup></th><th class="r">50–59<sup>2</sup></th><th class="r">60–69<sup>2</sup></th><th class="r">70–79<sup>2</sup></th><th class="r">80–89<sup>2</sup></th></tr></thead>
+<tbody>
+<tr><td><span class="sec">I</span> Biomécanique</td><td class="r num">15</td><td class="r num">99,3</td><td class="r num">96,3</td><td class="r num">89,0</td><td class="r num">83,7</td><td class="r num">78,6</td></tr>
+<tr><td><span class="sec">II</span> Limites de stabilité</td><td class="r num">21</td><td class="r num">100,0</td><td class="r num">94,8</td><td class="r num">92,1</td><td class="r num">87,1</td><td class="r num">85,2</td></tr>
+<tr><td><span class="sec">III</span> Anticipation (APA)</td><td class="r num">18</td><td class="r num">100,0</td><td class="r num">97,8</td><td class="r num">94,4</td><td class="r num">85,6</td><td class="r num">75,1</td></tr>
+<tr><td><span class="sec">IV</span> Réactions</td><td class="r num">18</td><td class="r num">100,0</td><td class="r num">96,9</td><td class="r num">88,3</td><td class="r num">85,5</td><td class="r num">76,9</td></tr>
+<tr><td><span class="sec">V</span> Orientation sensorielle</td><td class="r num">15</td><td class="r num">100,0</td><td class="r num">98,3</td><td class="r num">96,7</td><td class="r num">94,7</td><td class="r num">88,8</td></tr>
+<tr><td><span class="sec">VI</span> Marche</td><td class="r num">21</td><td class="r num">99,0</td><td class="r num">92,6</td><td class="r num">90,0</td><td class="r num">77,8</td><td class="r num">73,1</td></tr>
+<tr style="font-weight:600"><td>Total</td><td class="r num">108</td><td class="r num">99,7</td><td class="r num">95,7</td><td class="r num">91,4</td><td class="r num">85,4</td><td class="r num">79,4</td></tr>
+</tbody></table>
+<p class="cap">Moyennes en % du maximum de la section. 20–40 ans : n = 30, âge moyen 24,2 ans (Thaïlande) ; 50–89 ans : n = 79, environ 20 par décennie (Canada). Chez l'adulte jeune, l'écart-type est quasi nul dans toutes les sections : 100 % est la règle.</p>
+<table>
+<thead><tr><th>Erreur de mesure</th><th class="r">Valeur</th><th>Population</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>MDC95 du total</td><td class="r num">8,2 pts (7,6 %)</td><td>Seniors à domicile</td><td class="src">Réf.<sup>4</sup></td></tr>
+<tr><td>MDC95 des sections</td><td class="r num">2,1–3,4 pts</td><td>Seniors à domicile</td><td class="src">Réf.<sup>4</sup></td></tr>
+<tr><td>MDC95 des sections</td><td class="r num">2,25–4,58 pts</td><td>Sclérose en plaques</td><td class="src">Réf.<sup>5</sup></td></tr>
+</tbody>
+</table>
+<p class="cap">Exemple utile en cabinet : chez des seniors avec cervicalgie chronique, les pertes portaient surtout sur les sections I, III et IV<sup>3</sup>.</p>
+</div>
+
+<h2><span class="n">5</span>Limites</h2>
+<ul class="ind" style="break-inside:avoid">
+<li>Normes jeunes issues d'un seul échantillon (n = 30, Thaïlande) ; normes à partir de 50 ans sur environ 20 sujets par décennie (Canada).</li>
+<li>Erreur de mesure des sections estimée chez des seniors et des patients SEP, pas chez l'adulte jeune.</li>
+<li>Sections moins fiables que le total : ne pas conclure sur une section à partir d'un seul point perdu.</li>
+<li>Correspondance section → traitement fondée sur le modèle théorique, sans validation par des essais à notre connaissance.</li>
+<li>Biais d'examinateur : la connaissance du tableau clinique influence la cotation des items qualitatifs. Coter les items chronométrés et mesurés avant d'interpréter.</li>
+<li>Durée de passation d'environ 30 minutes : à réserver aux situations où le profil changera la prise en charge.</li>
+</ul>
+
+<h2><span class="n">6</span>Références</h2>
+<ol class="refs">
+<li>Horak FB, Wrisley DM, Frank J. The Balance Evaluation Systems Test (BESTest) to differentiate balance deficits. <i>Phys Ther</i> 2009;89:484–498.</li>
+<li>O'Hoski S, Winship B, Herridge L, et al. Increasing the clinical utility of the BESTest, Mini-BESTest, and Brief-BESTest: normative values in Canadian adults who are healthy and aged 50 years or older. <i>Phys Ther</i> 2014;94(3):334–342.</li>
+<li>Madsalae T, Thongprong T, Chinkulprasert C, Boonsinsukh R. Can the balance evaluation systems test be used to identify system-specific postural control impairments in older adults with chronic neck pain? <i>Front Med</i> 2022;9:1012880.</li>
+<li>Interrater and test-retest reliability and minimal detectable change of the Balance Evaluation Systems Test (BESTest) and subsystems with community-dwelling older adults. Référence complète à vérifier.</li>
+<li>Étude de fiabilité et de validité du BESTest dans la sclérose en plaques (ICC des sections 0,66–0,93 ; MDC95 des sections 2,25–4,58 ; total 9,47). Référence complète à vérifier.</li>
+</ol>
+
+<footer><span>BESTest © 2008 F. Horak / Oregon Health &amp; Science University. Guide indépendant, non affilié à l'OHSU.</span><span class="num">v1.1 · 07/11/2026</span></footer>
+</body>
+</html>

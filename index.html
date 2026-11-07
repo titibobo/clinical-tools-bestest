@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BESTest · Mini-BESTest — passation clinique</title>
+<title>Contrôle postural : évaluation clinique · Th. Marin</title>
 <style>
 :root{
   --bg:#f6f5f2; --panel:#ffffff; --ink:#1d2327; --muted:#5f6b72; --line:#dfe2e0; --soft:#eef0ee;
@@ -31,7 +31,11 @@ header{position:sticky;top:0;z-index:20;background:var(--panel);border-bottom:1p
 .seg button{border:0;background:transparent;padding:7px 12px;font-size:13px;min-width:64px}
 .seg button+button{border-left:1px solid var(--line)}
 .seg button.on{background:var(--acc);color:#fff}
-.hdr-right{display:grid;grid-auto-flow:column;gap:8px;align-items:center}
+.hdr-right{display:grid;grid-auto-flow:column;gap:12px;align-items:center}
+.glink{font-size:13px;color:var(--acc);text-decoration:none;border:1px solid var(--line);border-radius:7px;padding:7px 10px;white-space:nowrap}
+.glink:hover{background:var(--acc-soft)}
+.ic{display:inline-block;text-align:center}
+.stag{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-left:6px}
 /* ---- layout ---- */
 .wrap{display:grid;grid-template-columns:var(--nav) 1fr;min-height:calc(100vh - 58px)}
 nav{border-right:1px solid var(--line);background:var(--panel);overflow:auto;position:sticky;top:58px;height:calc(100vh - 58px);padding:8px 0 90px}
@@ -40,7 +44,7 @@ nav{border-right:1px solid var(--line);background:var(--panel);overflow:auto;pos
 .navtabs button.on{background:var(--acc-soft);border-color:var(--acc);color:var(--acc);font-weight:500}
 .order{display:grid;grid-template-columns:1fr auto;align-items:center;padding:10px 12px 4px;font-size:12px;color:var(--muted)}
 .grp{padding:12px 12px 4px;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);display:grid;grid-template-columns:1fr auto}
-.row{display:grid;grid-template-columns:28px 1fr 52px;align-items:center;gap:6px;padding:7px 12px;border:0;background:transparent;width:100%;text-align:left;font-size:13.5px;border-left:3px solid transparent}
+.row{display:grid;grid-template-columns:24px 22px 1fr 52px;align-items:center;gap:6px;padding:7px 12px;border:0;background:transparent;width:100%;text-align:left;font-size:13.5px;border-left:3px solid transparent}
 .row:hover{background:var(--soft)}
 .row.cur{background:var(--acc-soft);border-left-color:var(--acc)}
 .row .n{color:var(--muted);text-align:right}
@@ -153,14 +157,14 @@ footer.cr{font-size:11.5px;color:var(--muted);margin-top:22px;line-height:1.5}
 </head>
 <body>
 <header>
-  <div class="brand">Équilibre — passation<small>BESTest · Mini-BESTest</small></div>
+  <div class="brand">Contrôle postural : évaluation clinique<small>Mini-BESTest &amp; BESTest · Th. Marin, PhD, DO — ESO Paris</small></div>
   <div class="meta">
     <label>Code patient<input id="pid" placeholder="ex. P-0142" autocomplete="off"></label>
     <label>Date<input id="pdate" type="date"></label>
     <label>Examinateur<input id="pexam" autocomplete="off"></label>
   </div>
   <div class="hdr-right">
-    <div class="seg" id="testSeg"><button data-t="mini">Mini</button><button data-t="best">BESTest</button></div>
+    <a class="glink" id="glink" href="guide_mbt.html" target="_blank" rel="noopener">Guide d’interprétation ↗</a><div class="seg" id="testSeg"><button data-t="mini">Mini</button><button data-t="best">BESTest</button></div>
   </div>
 </header>
 <div class="wrap">
@@ -193,15 +197,15 @@ const MINI = {
     { id: 'G', name: 'Marche dynamique', short: 'Marche' }
   ],
   stations: [
-    { id: 'chaise', name: 'Chaise sans accoudoirs' },
-    { id: 'debout', name: 'Debout, sol ferme (cible fixe 1,25–3,7 m)' },
-    { id: 'pouss', name: 'Poussées / lâchers (espace libre)' },
-    { id: 'mousse', name: 'Mousse 10 cm' },
-    { id: 'rampe', name: 'Plan incliné 10°' },
-    { id: 'marche', name: 'Couloir de marche + boîte 23 cm' },
-    { id: 'tug', name: 'TUG 3 m (chaise + marque au sol)' }
+    { id: 'chaise', ic: '🪑', name: 'Chaise sans accoudoirs' },
+    { id: 'debout', ic: '🧍', name: 'Debout, sol ferme (cible fixe 1,25–3,7 m)' },
+    { id: 'pouss', ic: '🙏', name: 'Poussées / lâchers (espace libre)' },
+    { id: 'mousse', ic: '🧽', name: 'Mousse 10 cm' },
+    { id: 'rampe', ic: '🎢', name: 'Plan incliné 10°' },
+    { id: 'marche', ic: '🚶', name: 'Couloir de marche + obstacle' },
+    { id: 'tug', ic: '⏱️', name: 'TUG 3 m (chaise + marque au sol)' }
   ],
-  materiel: ['Mousse Temper® T41, 10 cm, densité moyenne', 'Chaise ferme sans accoudoirs ni roulettes', 'Plan incliné 10° (≥ 60 × 60 cm)', 'Chronomètre (intégré ici)', 'Boîte de 23 cm de haut (2 boîtes à chaussures)', 'Marque au sol à 3 m de la chaise', 'Chaussures plates OU pieds nus (sans chaussettes)'],
+  materiel: ['Chaise ferme sans accoudoirs ni roulettes', 'Chronomètre (intégré ici)', 'Mousse Temper® T41, 10 cm, densité moyenne', 'Plan incliné 10° (≥ 60 × 60 cm)', 'Obstacle L = 30, l = 20, <b>h = 23</b> cm (2 boîtes à chaussures empilées et scotchées), à 3 m du départ', 'Marque au sol à 3 m de la chaise', 'Chaussures plates OU pieds nus (sans chaussettes)'],
   rules: ['14 épreuves cotées 0–2, total /28.', 'Aide technique → coter une catégorie en dessous.', 'Assistance physique → 0.', 'Épreuves 3 et 6 : retenir le côté le moins bon.', 'Épreuve 3 : meilleur des 2 essais pour chaque côté.', 'Épreuve 14 : ralentissement > 10 % en double tâche → −1 point.'],
   items: [
     { id: 'M1', n: 1, sec: 'A', st: 'chaise', title: 'Assis à debout',
@@ -263,7 +267,7 @@ const MINI = {
         auto: v => { if (v.des) return { s: 0 }; const p = num(v.pas); if (p === null) return null; return { s: p <= 3 ? 2 : 1 }; } }] },
     { id: 'M13', n: 13, sec: 'G', st: 'marche', title: 'Enjamber un obstacle',
       patient: 'Marchez à votre vitesse normale. Quand vous arrivez à la boîte, passez par-dessus, pas autour, et continuez.',
-      exam: 'Boîte de 23 cm placée à 3 m du départ.',
+      exam: 'Obstacle L = 30, l = 20, h = 23 cm (2 boîtes à chaussures empilées et scotchées), placé à 3 m du départ.',
       combine: 'single', units: [{ key: 'u', levels: L([[2, 'Enjambe avec un changement minimal de vitesse, bon équilibre'], [1, 'Touche la boîte OU comportement prudent (ralentit)'], [0, 'Incapable d’enjamber OU contourne la boîte']]) }] },
     { id: 'M14', n: 14, sec: 'G', st: 'tug', title: 'TUG avec double tâche (3 m)', dt: true,
       patient: 'TUG : quand je dis « go », levez-vous, marchez à vitesse normale jusqu’à la marque, faites demi-tour et revenez vous asseoir. — Double tâche : comptez à rebours de 3 en 3 à voix haute à partir de [N] pendant tout le parcours.',
@@ -294,21 +298,21 @@ const BEST = {
     { id: 'VI', name: 'VI. Stabilité locomotrice', short: 'Marche' }
   ],
   stations: [
-    { id: 'exam', name: 'Examen debout (pieds, alignement, cheville, hanche)' },
-    { id: 'sol', name: 'Sol (chaise à proximité)' },
-    { id: 'assis', name: 'Assis sur surface dure' },
-    { id: 'mur', name: 'Mètre ruban au mur' },
-    { id: 'chaise', name: 'Chaise' },
-    { id: 'debout', name: 'Debout, sol ferme' },
-    { id: 'marchep', name: 'Marche d’escalier 15 cm' },
-    { id: 'poids', name: 'Poids 2,5 kg' },
-    { id: 'pouss', name: 'Poussées / lâchers' },
-    { id: 'mousse', name: 'Sol dur / mousse' },
-    { id: 'rampe', name: 'Rampe 10°' },
-    { id: 'marche', name: 'Couloir 6 m + 2 obstacles' },
-    { id: 'tug', name: 'TUG 3 m (chaise à accoudoirs)' }
+    { id: 'exam', ic: '🔍', name: 'Examen debout (pieds, alignement, cheville, hanche)' },
+    { id: 'sol', ic: '⬇️', name: 'Sol (chaise à proximité)' },
+    { id: 'assis', ic: '💺', name: 'Assis sur surface dure' },
+    { id: 'mur', ic: '📏', name: 'Mètre ruban au mur' },
+    { id: 'chaise', ic: '🪑', name: 'Chaise' },
+    { id: 'debout', ic: '🧍', name: 'Debout, sol ferme' },
+    { id: 'marchep', ic: '🪜', name: 'Marche d’escalier 15 cm' },
+    { id: 'poids', ic: '🏋️', name: 'Poids 2,5 kg' },
+    { id: 'pouss', ic: '🙏', name: 'Poussées / lâchers' },
+    { id: 'mousse', ic: '🧽', name: 'Sol dur / mousse' },
+    { id: 'rampe', ic: '🎢', name: 'Rampe 10°' },
+    { id: 'marche', ic: '🚶', name: 'Couloir 6 m + 2 obstacles' },
+    { id: 'tug', ic: '⏱️', name: 'TUG 3 m (chaise à accoudoirs)' }
   ],
-  materiel: ['Chronomètre (intégré ici)', 'Mètre ruban fixé au mur (Functional Reach)', 'Mousse densité moyenne ≈ 60 × 60 × 10 cm', 'Rampe 10°', 'Marche d’escalier 15 cm', 'Poids 2,5 kg', 'Chaise à accoudoirs', 'Marques au sol à 3 m et 6 m', 'Obstacles pour l’item 25', 'Chaussures plates OU pieds nus (sans chaussettes)'],
+  materiel: ['Chaise à accoudoirs', 'Chronomètre (intégré ici)', 'Mousse densité moyenne ≈ 60 × 60 × 10 cm', 'Rampe 10°', 'Obstacle L = 30, l = 20, <b>h = 23</b> cm (2 boîtes à chaussures empilées et scotchées) ; la VF parle de « deux obstacles »', 'Marques au sol à 3 m et 6 m', 'Mètre ruban fixé au mur (Functional Reach)', 'Marche d’escalier 15 cm', 'Poids 2,5 kg', 'Chaussures plates OU pieds nus (sans chaussettes)'],
   rules: ['27 items cotés 0–3 (36 unités de cotation), total /108, exprimé en %.', 'Aide technique → une catégorie en dessous.', 'Assistance physique → 0.', 'Items bilatéraux (6, 8, 11, 18) et 19 A–D : les sous-scores s’additionnent.', 'Score par section en % du maximum de la section.'],
   items: [
     { id: 'B1', n: 1, sec: 'I', st: 'exam', title: 'Base de support',
@@ -433,7 +437,7 @@ const BEST = {
         auto: v => { const p = num(v.pas); if (v.ins) return { s: 1, note: '0 si ne tourne pas pieds rapprochés' }; if (p === null) return null; if (p < 3) return { s: 3 }; if (p < 4) return { s: 2 }; return { s: 2, note: '≥ 4 pas sans instabilité : non prévu par la fiche VF (« < 4 pas ») — 2 proposé, à trancher' }; } }] },
     { id: 'B25', n: 25, sec: 'VI', st: 'marche', title: 'Marche avec obstacles',
       patient: 'Marchez à vitesse normale. Passez par-dessus les obstacles.',
-      exam: 'Obstacles à 3 m. Noter hésitations, petits pas, contacts.',
+      exam: 'Obstacle à 3 m : L = 30, l = 20, h = 23 cm (2 boîtes à chaussures empilées et scotchées ; la fiche originale décrit un seul obstacle, la VF en mentionne deux). Noter hésitations, petits pas, contacts.',
       combine: 'single', units: [{ key: 'u', levels: L([[3, 'Passe les deux obstacles sans changer de vitesse ni instabilité'], [2, 'Passe avec ralentissement, sans instabilité'], [1, 'Passe avec instabilités OU contact'], [0, 'Impossible ET ralentissement OU assistance']]) }] },
     { id: 'B26', n: 26, sec: 'VI', st: 'tug', title: 'Timed Up and Go',
       patient: 'Quand je dis GO, levez-vous, marchez à vitesse normale jusqu’à la marque, faites le tour et revenez vous asseoir.',
@@ -483,7 +487,6 @@ function totals(test, st) {
     if (r.score !== null) { S.score += r.score; S.done++; total += r.score; done++; } });
   return { total, max, done, n: test.items.length, sec };
 }
-
 </script>
 <script>
 (function(){
@@ -508,8 +511,8 @@ function ordered(){
 }
 function groups(){
   const t=T();
-  if(app.order==='official') return t.sections.map(s=>({name:s.name,items:t.items.filter(i=>i.sec===s.id)}));
-  return t.stations.map(s=>({name:s.name,items:t.items.filter(i=>i.st===s.id)})).filter(g=>g.items.length);
+  if(app.order==='official') return t.id==='mini'?[{name:'Ordre officiel',items:t.items.slice()}]:t.sections.map(s=>({name:s.name,items:t.items.filter(i=>i.sec===s.id)}));
+  return t.stations.map(s=>({name:s.ic+'  '+s.name,items:t.items.filter(i=>i.st===s.id)})).filter(g=>g.items.length);
 }
 
 /* ---------- chrono ---------- */
@@ -545,7 +548,7 @@ function renderNav(){
   h+='<div class="order"><span>Ordre de passation</span><div class="seg" id="ordSeg"><button data-o="station" class="'+(app.order==='station'?'on':'')+'">Postes</button><button data-o="official" class="'+(app.order==='official'?'on':'')+'">Officiel</button></div></div>';
   groups().forEach(g=>{const done=g.items.filter(i=>itemScore(T(),i,S()).score!==null).length;
     h+='<div class="grp"><span>'+esc(g.name)+'</span><span class="num">'+done+'/'+g.items.length+'</span></div>';
-    g.items.forEach(it=>{h+='<button class="row'+(app.view==='item'&&app.cur[app.test]===it.id?' cur':'')+'" data-go="'+it.id+'"><span class="n num">'+it.n+'</span><span>'+esc(it.title)+'</span><span class="sc">'+badge(it)+'</span></button>';});});
+    g.items.forEach(it=>{h+='<button class="row'+(app.view==='item'&&app.cur[app.test]===it.id?' cur':'')+'" data-go="'+it.id+'"><span class="n num">'+it.n+'</span><span class="ic">'+T().stations.find(x=>x.id===it.st).ic+'</span><span>'+esc(it.title)+(T().id==='best'&&app.order==='station'?'<span class="stag">'+it.sec+'</span>':'')+'</span><span class="sc">'+badge(it)+'</span></button>';});});
   $('#nav').innerHTML=h;
 }
 
@@ -565,7 +568,7 @@ function renderItem(){
   const idx=list.indexOf(it); const r=itemScore(t,it,S()); const m=itemMax(it);
   const sec=t.sections.find(s=>s.id===it.sec), st=t.stations.find(s=>s.id===it.st);
   let h='<div class="mobnav"><button class="btn sm" data-view="synthese">Synthèse</button><select id="mobsel">'+list.map(i=>'<option value="'+i.id+'"'+(i===it?' selected':'')+'>'+i.n+'. '+esc(i.title)+'</option>').join('')+'</select></div>';
-  h+='<div class="card"><div class="ihead"><span class="no num">'+it.n+'</span><h2>'+esc(it.title)+'<span class="crumb">'+esc(sec.name)+' · Poste : '+esc(st.name)+'</span></h2><span class="tot num">'+(r.score!==null?r.score:'–')+'<span style="color:var(--muted)">/'+m+'</span><small>score item</small></span></div>';
+  h+='<div class="card"><div class="ihead"><span class="no num">'+it.n+'</span><h2>'+esc(it.title)+'<span class="crumb">'+(t.id==='best'?esc(sec.name)+' · ':'')+st.ic+' '+esc(st.name)+'</span></h2><span class="tot num">'+(r.score!==null?r.score:'–')+'<span style="color:var(--muted)">/'+m+'</span><small>score item</small></span></div>';
   let say=it.patient;
   if(it.dt){const [a,b]=dtNumber(); say=say.replace('[N]','<b style="display:inline;font-size:inherit;text-transform:none;letter-spacing:0;color:var(--ink)">'+b+'</b>');
     h+='<div class="dtnum"><span>Entraînement assis à partir de</span><span class="big num">'+a+'</span><span>puis passation à partir de <b class="num">'+b+'</b> <button class="btn sm" id="reroll">↻</button></span></div>';}
@@ -588,20 +591,20 @@ function renderItem(){
   h+=copyright();
   $('#main').innerHTML=h;
 }
-function copyright(){return '<footer class="cr">BESTest © 2008 F. Horak / Oregon Health & Science University — adaptation française A. Kubicki (INSERM U1093). Mini-BESTest © 2005–2013 OHSU (Franchignoni et al., 2010) — version française J.-F. Lemay, A. Roy, D. H. Gagnon. Fiches originales et conditions d’utilisation : bestest.us. Outil d’aide à la passation : les règles automatiques reproduisent les fiches ; la cotation retenue reste celle du clinicien. Aucune connexion réseau : les données restent dans ce navigateur, sur cet appareil. Exporter régulièrement (JSON) comme sauvegarde.</footer>';}
+function copyright(){return '<footer class="cr">Outil conçu par Th. Marin, PhD, DO (ESO Paris). BESTest © 2008 F. Horak / Oregon Health & Science University — adaptation française A. Kubicki (INSERM U1093). Mini-BESTest © 2005–2013 OHSU (Franchignoni et al., 2010) — version française J.-F. Lemay, A. Roy, D. H. Gagnon. Fiches originales et conditions d’utilisation : bestest.us. Outil d’aide à la passation : les règles automatiques reproduisent les fiches ; la cotation retenue reste celle du clinicien. Aucune connexion réseau : les données restent dans ce navigateur, sur cet appareil. Exporter régulièrement (JSON) comme sauvegarde.</footer>';}
 
 /* ---------- synthèse ---------- */
 function summaryData(testId,st){const t=TESTS[testId];const tt=totals(t,st);return {t,tt};}
 function renderSynth(){
   const {t,tt}=summaryData(app.test,S());
   let h='<h1 class="v">Synthèse — '+t.name+'</h1><p class="sub">'+esc(app.meta.pid||'Patient non renseigné')+' · '+esc(app.meta.date||'')+' · '+tt.done+'/'+tt.n+' items cotés</p>';
-  h+='<div class="card"><table><thead><tr><th>Section</th><th class="r">Score</th><th class="r">Max</th><th class="r">%</th><th style="width:38%"></th></tr></thead><tbody>';
-  t.sections.forEach(s=>{const x=tt.sec[s.id];const p=x.max?x.score/x.max*100:0;
+  h+='<div class="card"><table><thead><tr><th>'+(t.id==='best'?'Section':'')+'</th><th class="r">Score</th><th class="r">Max</th><th class="r">%</th><th style="width:38%"></th></tr></thead><tbody>';
+  if(t.id==='best') t.sections.forEach(s=>{const x=tt.sec[s.id];const p=x.max?x.score/x.max*100:0;
     h+='<tr><td>'+esc(s.name)+(x.done<x.n?'<span class="tag">'+x.done+'/'+x.n+'</span>':'')+'</td><td class="r num">'+x.score+'</td><td class="r num">'+x.max+'</td><td class="r num">'+p.toFixed(0)+'</td><td><div class="sb"><div class="bar" style="height:8px"><i style="width:'+p+'%"></i></div></div></td></tr>';});
   const P=tt.total/tt.max*100;
   h+='<tr style="font-weight:600"><td>Total</td><td class="r num">'+tt.total+'</td><td class="r num">'+tt.max+'</td><td class="r num">'+P.toFixed(0)+'</td><td><div class="sb"><div class="bar" style="height:8px"><i style="width:'+P+'%"></i></div></div></td></tr></tbody></table>';
   if(tt.done<tt.n) h+='<div class="note">Passation incomplète : le total n’est pas interprétable en l’état.</div>';
-  h+='<div class="note info">'+(app.test==='mini'?'Le Mini-BESTest a été construit comme échelle unidimensionnelle : le total /28 est la mesure de référence ; les sous-scores (3 items chacun, 5 pour la marche) sont descriptifs. Repères de changement (troubles de l’équilibre d’origine neurologique mixte, Godi et al. 2013) : MDC95 = 3,5 pts ; MCID = 4 pts. Non établis pour une patientèle ostéopathique ambulatoire.':'Le BESTest est conçu pour profiler les systèmes (sections en %) ; comparer les sections entre elles plutôt que le total seul. Aucun seuil de changement n’est intégré ici.')+'</div>';
+  h+='<div class="note info">'+(app.test==='mini'?'Le Mini-BESTest mesure un construit unique (équilibre dynamique) : seul le total /28 est interprété. Repères de changement (troubles de l’équilibre d’origine neurologique mixte, Godi et al. 2013) : MDC95 = 3,5 pts ; MCID = 4 pts. Non établis pour une patientèle ostéopathique ambulatoire.':'Le BESTest est conçu pour profiler les systèmes (sections en %) ; comparer les sections entre elles plutôt que le total seul. Aucun seuil de changement n’est intégré ici.')+'</div>';
   h+='<div class="pager" style="grid-template-columns:auto 1fr auto"><button class="btn" id="saveSess">Enregistrer la séance dans le suivi</button><span></span><span style="display:grid;grid-auto-flow:column;gap:8px"><button class="btn" id="copyRep">Copier le compte rendu</button><button class="btn" id="printRep">Imprimer</button><button class="btn" id="newSess">Nouvelle passation</button></span></div></div>';
   // détail
   h+='<div class="card" style="margin-top:16px"><table><thead><tr><th class="r" style="width:40px">#</th><th>Item</th><th>Détail</th><th class="r">Score</th></tr></thead><tbody>';
@@ -613,7 +616,7 @@ function renderSynth(){
 function report(){const {t,tt}=summaryData(app.test,S());
   let s=t.name+' — '+(app.meta.pid||'')+' — '+(app.meta.date||'')+(app.meta.exam?' — '+app.meta.exam:'')+'\n';
   s+='Total : '+tt.total+'/'+tt.max+' ('+(tt.total/tt.max*100).toFixed(0)+' %)'+(tt.done<tt.n?' [incomplet '+tt.done+'/'+tt.n+']':'')+'\n';
-  t.sections.forEach(x=>{const q=tt.sec[x.id];s+='  '+x.name+' : '+q.score+'/'+q.max+' ('+(q.score/q.max*100).toFixed(0)+' %)\n';});
+  if(t.id==='best') t.sections.forEach(x=>{const q=tt.sec[x.id];s+='  '+x.name+' : '+q.score+'/'+q.max+' ('+(q.score/q.max*100).toFixed(0)+' %)\n';});
   const notes=t.items.filter(it=>(S().notes||{})[it.id]).map(it=>'  '+it.n+'. '+it.title+' : '+S().notes[it.id]);
   if(notes.length) s+='Observations :\n'+notes.join('\n')+'\n';
   return s;}
@@ -621,9 +624,9 @@ function report(){const {t,tt}=summaryData(app.test,S());
 /* ---------- matériel ---------- */
 function renderMat(){const t=T(); app.check[app.test]=app.check[app.test]||{};
   let h='<h1 class="v">Préparation — '+t.name+'</h1><p class="sub">Durée indicative : '+(app.test==='mini'?'≈ 15 min':'≈ 30–35 min')+'. L’ordre « postes » regroupe les items par installation pour limiter les déplacements.</p><div class="grid2"><div class="card"><h3 style="margin-top:0">Matériel</h3><ul class="checklist">';
-  t.materiel.forEach((m,i)=>{h+='<li><input type="checkbox" data-chk="'+i+'" '+(app.check[app.test][i]?'checked':'')+'><span>'+esc(m)+'</span></li>';});
+  t.materiel.forEach((m,i)=>{const auto=/^Chronomètre/.test(m);h+='<li><input type="checkbox" data-chk="'+i+'" '+(auto||app.check[app.test][i]?'checked':'')+(auto?' disabled':'')+'><span>'+m+'</span></li>';});
   h+='</ul></div><div class="card"><h3 style="margin-top:0">Règles de cotation</h3><ul style="margin:0;padding-left:18px">'+t.rules.map(r=>'<li>'+esc(r)+'</li>').join('')+'</ul></div></div>';
-  h+='<div class="card" style="margin-top:16px"><h3 style="margin-top:0">Séquence par postes</h3><table><thead><tr><th>Poste</th><th>Items</th></tr></thead><tbody>'+t.stations.map(s=>{const its=t.items.filter(i=>i.st===s.id);return its.length?'<tr><td>'+esc(s.name)+'</td><td class="num">'+its.map(i=>i.n).join(', ')+'</td></tr>':'';}).join('')+'</tbody></table><div class="note info">Réordonner la passation s’écarte de la procédure standardisée ; l’ordre interne de l’item 19 (A → D) est conservé. Pour la recherche, préférer l’ordre officiel et le documenter.</div></div>'+copyright();
+  h+='<div class="card" style="margin-top:16px"><h3 style="margin-top:0">Séquence par postes</h3><table><thead><tr><th>Poste</th><th>Items</th></tr></thead><tbody>'+t.stations.map(s=>{const its=t.items.filter(i=>i.st===s.id);return its.length?'<tr><td>'+s.ic+'  '+esc(s.name)+'</td><td class="num">'+its.map(i=>i.n).join(', ')+'</td></tr>':'';}).join('')+'</tbody></table><div class="note info">Réordonner la passation s’écarte de la procédure standardisée ; l’ordre interne de l’item 19 (A → D) est conservé. Pour la recherche, préférer l’ordre officiel et le documenter.</div></div>'+copyright();
   $('#main').innerHTML=h;}
 
 /* ---------- suivi ---------- */
@@ -635,13 +638,13 @@ function renderHist(){
   const mine=pid?all.filter(h=>h.pid===pid):all; mine.sort((a,b)=>(a.pid||'').localeCompare(b.pid||'')||(a.date||'').localeCompare(b.date||''));
   const t=T();
   let h='<h1 class="v">Suivi — '+t.name+'</h1><p class="sub">'+(pid?'Séances du patient '+esc(pid):'Toutes les séances (renseigner un code patient pour filtrer)')+' · '+mine.length+' séance(s)'+(storageOK?'':' · <b style="color:var(--bad)">stockage local indisponible : exporter avant de fermer</b>')+'</p>';
-  h+='<div class="card"><table><thead><tr><th>Patient</th><th>Date</th>'+t.sections.map(s=>'<th class="r">'+esc(s.short)+'</th>').join('')+'<th class="r">Total</th><th class="r">Δ</th><th></th></tr></thead><tbody>';
+  h+='<div class="card"><table><thead><tr><th>Patient</th><th>Date</th>'+(t.id==='best'?t.sections.map(s=>'<th class="r">'+esc(s.short)+'</th>').join(''):'')+'<th class="r">Total</th><th class="r">Δ</th><th></th></tr></thead><tbody>';
   let prev=null;
   mine.forEach(x=>{let d='';if(prev&&prev.pid===x.pid){const dv=x.total-prev.total;let tag='';
       if(app.test==='mini'){tag=Math.abs(dv)>=4?'<span class="tag '+(dv>0?'ok':'bad')+'">≥ MCID</span>':Math.abs(dv)>3.5?'<span class="tag">> MDC</span>':'';}
       d='<span class="delta '+(dv>0?'up':dv<0?'down':'')+'">'+(dv>0?'+':'')+dv+'</span>'+tag;}
-    h+='<tr><td>'+esc(x.pid||'—')+'</td><td class="num">'+esc(x.date||'')+'</td>'+t.sections.map(s=>'<td class="r num">'+x.sections[s.id]+'</td>').join('')+'<td class="r num"><b>'+x.total+'</b>/'+x.max+(x.complete?'':'<span class="tag">incomplet</span>')+'</td><td class="r num">'+d+'</td><td class="r"><button class="btn sm" data-load="'+x.uid+'">Ouvrir</button> <button class="btn sm" data-del="'+x.uid+'">×</button></td></tr>';prev=x;});
-  if(!mine.length) h+='<tr><td colspan="'+(t.sections.length+5)+'" class="small">Aucune séance enregistrée. Utiliser « Enregistrer la séance » dans la synthèse.</td></tr>';
+    h+='<tr><td>'+esc(x.pid||'—')+'</td><td class="num">'+esc(x.date||'')+'</td>'+(t.id==='best'?t.sections.map(s=>'<td class="r num">'+x.sections[s.id]+'</td>').join(''):'')+'<td class="r num"><b>'+x.total+'</b>/'+x.max+(x.complete?'':'<span class="tag">incomplet</span>')+'</td><td class="r num">'+d+'</td><td class="r"><button class="btn sm" data-load="'+x.uid+'">Ouvrir</button> <button class="btn sm" data-del="'+x.uid+'">×</button></td></tr>';prev=x;});
+  if(!mine.length) h+='<tr><td colspan="'+((t.id==='best'?t.sections.length:0)+5)+'" class="small">Aucune séance enregistrée. Utiliser « Enregistrer la séance » dans la synthèse.</td></tr>';
   h+='</tbody></table>';
   if(app.test==='mini') h+='<div class="note info">Δ comparé à la séance précédente du même patient. Repères : MDC95 3,5 ; MCID 4 points (Godi et al. 2013, population neurologique mixte) — à transposer avec prudence.</div>';
   h+='</div><div class="card" style="margin-top:16px"><h3 style="margin-top:0">Export / import</h3><p class="small" style="margin-top:0">CSV : une ligne par séance (scores par unité de cotation + mesures brutes), prêt pour R/Python. JSON : sauvegarde complète, réimportable sur un autre appareil.</p>'+
@@ -668,13 +671,14 @@ function modal(title,text){const d=document.createElement('div');d.className='mo
 /* ---------- dock ---------- */
 function renderDock(){const {t,tt}=summaryData(app.test,S());
   let h='<div class="totbox"><span class="big num">'+tt.total+'<span style="color:var(--muted);font-size:16px">/'+tt.max+'</span></span><small>'+t.name+' · '+tt.done+'/'+tt.n+' items<br>'+(tt.total/tt.max*100).toFixed(0)+' %</small></div><div class="secbars">';
-  t.sections.forEach(s=>{const x=tt.sec[s.id];h+='<div class="sb"><div class="lab"><span>'+esc(s.short)+'</span><span class="num">'+x.score+'/'+x.max+'</span></div><div class="bar"><i style="width:'+(x.score/x.max*100)+'%"></i></div></div>';});
+  if(t.id==='best') t.sections.forEach(s=>{const x=tt.sec[s.id];h+='<div class="sb"><div class="lab"><span>'+esc(s.short)+'</span><span class="num">'+x.score+'/'+x.max+'</span></div><div class="bar"><i style="width:'+(x.score/x.max*100)+'%"></i></div></div>';});
   h+='</div><div class="act"><button class="btn sm" data-view="synthese">Synthèse</button></div>';
   $('#dock').innerHTML=h;}
 
 /* ---------- rendu global ---------- */
 function render(){
   document.querySelectorAll('#testSeg button').forEach(b=>b.classList.toggle('on',b.dataset.t===app.test));
+  $('#glink').href=app.test==='mini'?'guide_mbt.html':'guide_bestest.html';
   $('#pid').value=app.meta.pid;$('#pdate').value=app.meta.date;$('#pexam').value=app.meta.exam;
   const ex=document.querySelector('details.exam'); if(ex) app.examOpen=ex.open;
   const ae=document.activeElement; const focusKey=ae&&(ae.dataset.num||ae.dataset.note); const sel=focusKey&&ae.selectionStart!=null?[ae.selectionStart,ae.selectionEnd]:null;
